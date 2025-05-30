@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+description: "ETHPrague 2025 Hackathon Project Overview"
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+alwaysApply: true
+---
+
+## Project: PropenenTLS
+
+### Overview
+PropenenTLS is a decentralized protocol for creators to launch personal tokens that fans can earn or purchase based on real engagement. Fan actions on X (e.g., likes, follows) are verified through ZK-TLS proofs in-browser and attested via vLayer. The system supports both crypto-native and non-crypto users through off-chain attestations, enabling a more accessible creator economy.
+
+### Problem Statement
+Engagement with creators on traditional platforms is not verifiable or rewarded. Web3 creator tools are often gated behind crypto onboarding, excluding non-technical or non-wallet users. There is a need for trustless engagement verification and broader accessibility.
+
+### Proposed Solution
+PropenenTLS allows creators to deploy cross-chain tokens and define custom gating and earning rules. Fan engagement on X is verified using ZK-TLS, then attested through vLayer. Fans can claim tokens for activity or purchase them without crypto, using banking-based attestations (e.g., Revolut). LayerZero ensures all tokens are OFTs, and Flow supports additional deployment.
+
+### Technical Stack
+- **Smart Contracts**: Solidity (ERC-20/OFT, attestation-based access, bonding), Cadence (Flow support)
+- **Frontend**: React + Next.js
+- **Backend**: Node.js + Express (TLS proof processing, attestation relay)
+- **Data Sources**: X (Twitter) for engagement; vLayer for attestations (e.g., Revolut)
+- **Interoperability**: LayerZero for OFT cross-chain token standard
+- **Storage**: IPFS for off-chain creator metadata
+
+### Sponsor Integrations
+- **vLayer**:
+  - WebProofs: Browser-based ZK proofs for actions on X, such as likes and follows.
+  - Banking Attestations: Enables fans to purchase creator tokens with proof of identity (e.g., Revolut) instead of on-chain crypto.
+  - zkP2Bonding: Attestation-based token buying flow for walletless users.
+  - Gating: Token minting and purchasing restricted to users with specific proofs (e.g., following a creator on X).
+  - zkP2P Market: P2P orderbook trading with proof-based gating.
+  - Teleport: Enforces custom access rules using NFT or token ownership from any chain.
+
+- **LayerZero**:
+  - All creator tokens are OFTs, enabling frictionless cross-chain transfers and future composability.
+
+- **Flow**:
+  - Token factory and creator logic deployed to Flow for easy integration with apps targeting mainstream users and consumer contexts.
+
+### Impact
+PropenenTLS bridges real-world social interaction with verifiable, decentralized value transfer. It lowers onboarding friction for fans by removing the need for wallets or tokens upfront, while empowering creators with configurable, attestable economies.
+
+### Future Plans
+- Add more Web2 platforms beyond X
+- Integrate fiat on-ramps tied to attestation frameworks
+- Expand zkP2P market with social features and staking
+- Develop creator analytics and fan engagement dashboards
+- Explore DAO-based management for creator token governance
