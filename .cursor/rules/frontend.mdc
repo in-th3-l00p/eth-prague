@@ -1,0 +1,391 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## PropenenTLS Frontend Implementation Guide
+
+### Tech Stack Overview
+- **Framework**: Next.js 15 with App Router
+- **Runtime**: React 19 with latest features
+- **Styling**: Tailwind CSS v4 (no config file needed)
+- **UI Components**: shadcn/ui with Radix primitives
+- **State Management**: React hooks + Context API for global state
+- **Icons**: Lucide React for consistent iconography
+- **Animations**: Framer Motion for smooth interactions
+- **Forms**: React Hook Form with Zod validation
+- **Web3**: viem + wagmi for blockchain interactions
+- **ZK Proofs**: vLayer SDK for browser-based proof generation
+
+### Application Architecture Overview
+
+The PropenenTLS platform serves **two distinct user types** with different interfaces and feature sets:
+
+#### 1. **Influencer Perspective** (Creator/Token Issuer)
+Influencers create and manage their own social tokens, set engagement requirements, and monitor their community growth.
+
+#### 2. **Fan Perspective** (Token Holder/Supporter)
+Fans discover influencers, earn or purchase tokens through verified engagement, and manage their token portfolio.
+
+Each perspective has its own dedicated interface, navigation, and feature set while sharing core UI components.
+
+### Core User Journeys
+
+#### 1. Influencer Journey (Creator/Token Issuer)
+**Flow**: Landing → Connect Wallet → Create Token → Set Rules → Deploy → Manage Community
+```
+/landing → /connect → /influencer/onboard → /influencer/create/token → /influencer/create/rules → /influencer/create/deploy → /influencer/dashboard
+```
+
+**Key Screens**:
+- **Influencer Landing**: Creator-focused value proposition, success stories
+- **Wallet Connection**: Professional-grade wallet options with multi-sig support
+- **Influencer Onboarding**: Profile setup, social verification, creator guidelines
+- **Token Creation**: Name, symbol, total supply, description, branding assets
+- **Gating Rules**: X follow requirements, engagement thresholds, custom criteria
+- **Deployment**: Cross-chain selection (LayerZero OFT), gas optimization, confirmation
+- **Influencer Dashboard**: 
+  - Community analytics and growth metrics
+  - Fan engagement tracking
+  - Token price and volume charts
+  - Rule management and adjustments
+  - Revenue tracking and withdrawals
+  - Fan tier management
+
+#### 2. Fan Journey - Crypto Users
+**Flow**: Discover → Connect → Verify → Earn/Buy → Portfolio Management
+```
+/discover → /connect → /fan/verify → /fan/token/[id] → /fan/portfolio
+```
+
+**Key Screens**:
+- **Discovery**: Influencer listings, trending tokens, personalized recommendations
+- **Fan Onboarding**: Interest selection, favorite creators, notification preferences
+- **Verification**: X engagement proof generation (ZK-TLS) for earning eligibility
+- **Token Page**: Influencer info, token economics, earning opportunities, purchase options
+- **Fan Portfolio**: 
+  - Owned tokens across all chains
+  - Earning opportunities and progress
+  - Transaction history
+  - Cross-chain asset management
+  - Staking and rewards tracking
+
+#### 3. Fan Journey - Non-Crypto Users
+**Flow**: Discover → Banking Auth → Verify → Purchase → Simple Portfolio
+```
+/discover → /fan/onboard → /fan/verify → /fan/token/[id]/purchase → /fan/simple-portfolio
+```
+
+**Key Screens**:
+- **Simplified Onboarding**: Banking attestation (Revolut integration), no wallet complexity
+- **Streamlined UI**: No blockchain terminology, familiar social media UX
+- **Purchase Flow**: Fiat-like experience with attestation verification
+- **Simple Portfolio**: Clean asset view without technical blockchain details
+
+### Dual Interface Architecture
+
+#### Route Structure by User Type
+```
+src/app/
+├── (public)/              # Shared public routes
+│   ├── landing/           # Landing page with role selection
+│   ├── discover/          # Public token discovery
+│   └── token/[id]/        # Public token information
+├── (influencer)/          # Influencer-specific routes
+│   ├── onboard/           # Creator onboarding
+│   ├── create/            # Token creation flows
+│   ├── dashboard/         # Creator dashboard
+│   ├── analytics/         # Advanced analytics
+│   ├── community/         # Fan management
+│   └── settings/          # Creator settings
+├── (fan)/                 # Fan-specific routes
+│   ├── onboard/           # Fan onboarding
+│   ├── discover/          # Enhanced discovery with personalization
+│   ├── verify/            # Engagement verification
+│   ├── portfolio/         # Token portfolio management
+│   ├── earn/              # Earning opportunities
+│   └── simple-portfolio/  # Non-crypto user portfolio
+└── api/                   # Shared API routes
+```
+
+#### Navigation Structure
+
+**Influencer Navigation**:
+```tsx
+const influencerNav = [
+  { label: 'Dashboard', href: '/influencer/dashboard', icon: BarChart3 },
+  { label: 'Create Token', href: '/influencer/create', icon: Plus },
+  { label: 'Community', href: '/influencer/community', icon: Users },
+  { label: 'Analytics', href: '/influencer/analytics', icon: TrendingUp },
+  { label: 'Revenue', href: '/influencer/revenue', icon: DollarSign },
+  { label: 'Settings', href: '/influencer/settings', icon: Settings },
+];
+```
+
+**Fan Navigation**:
+```tsx
+const fanNav = [
+  { label: 'Discover', href: '/fan/discover', icon: Search },
+  { label: 'Portfolio', href: '/fan/portfolio', icon: Wallet },
+  { label: 'Earn', href: '/fan/earn', icon: Gift },
+  { label: 'Following', href: '/fan/following', icon: Heart },
+  { label: 'Activity', href: '/fan/activity', icon: Activity },
+];
+```
+
+### UI/UX Design System
+
+#### Dual Theme Approach
+
+**Influencer Interface**:
+- Professional, dashboard-focused design
+- Rich data visualizations and charts
+- Advanced controls and configurations
+- Business-oriented color scheme (blues, purples)
+- Dense information layout for power users
+
+**Fan Interface**:
+- Social media inspired, engaging design
+- Card-based, visual content focus
+- Simplified interactions and gamification
+- Vibrant, community-oriented colors (gradients, bright accents)
+- Mobile-first, thumb-friendly interactions
+
+#### Color Palette Extensions
+```css
+/* Influencer Theme */
+--influencer-primary: 224 71% 36%;     /* Professional blue */
+--influencer-accent: 262 83% 58%;      /* Purple accent */
+--influencer-success: 142 76% 36%;     /* Success green */
+--influencer-bg: 220 13% 18%;          /* Dark dashboard */
+
+/* Fan Theme */
+--fan-primary: 271 91% 65%;            /* Vibrant purple */
+--fan-accent: 142 69% 58%;             /* Bright green */
+--fan-gradient: linear-gradient(135deg, var(--fan-primary), var(--fan-accent));
+--fan-bg: 0 0% 100%;                   /* Clean white */
+```
+
+#### Component Variations by User Type
+
+**Influencer Dashboard Card**:
+```tsx
+<Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700">
+  <CardHeader className="pb-3">
+    <div className="flex items-center justify-between">
+      <CardTitle className="text-slate-100">Community Growth</CardTitle>
+      <TrendingUp className="h-5 w-5 text-emerald-400" />
+    </div>
+  </CardHeader>
+  <CardContent>
+    <div className="text-3xl font-bold text-slate-100">+1,247</div>
+    <p className="text-slate-400">New fans this month</p>
+  </CardContent>
+</Card>
+```
+
+**Fan Discovery Card**:
+```tsx
+<Card className="overflow-hidden group hover:scale-105 transition-transform">
+  <div className="relative">
+    <Image src={creator.bannerUrl} className="h-32 w-full object-cover" />
+    <Badge className="absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500">
+      Trending
+    </Badge>
+  </div>
+  <CardContent className="p-4">
+    <div className="flex items-center gap-3">
+      <Avatar src={creator.avatar} className="h-12 w-12" />
+      <div>
+        <h3 className="font-semibold">{creator.name}</h3>
+        <p className="text-sm text-muted-foreground">{creator.followerCount} followers</p>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+```
+
+### State Management by User Type
+
+#### User-Specific State Structure
+```tsx
+interface AppState {
+  user: {
+    type: 'influencer' | 'fan' | null;
+    wallet?: Address;
+    profile?: InfluencerProfile | FanProfile;
+    preferences: UserPreferences;
+    isAuthenticated: boolean;
+  };
+  influencer?: {
+    tokens: CreatorToken[];
+    analytics: AnalyticsData;
+    community: CommunityMetrics;
+    revenue: RevenueData;
+  };
+  fan?: {
+    portfolio: TokenHolding[];
+    following: CreatorToken[];
+    earnProgress: EarnProgress[];
+    notifications: Notification[];
+  };
+  ui: {
+    theme: 'light' | 'dark';
+    layout: 'influencer' | 'fan';
+    sidebar: boolean;
+    modals: Record<string, boolean>;
+  };
+}
+```
+
+#### Context Providers with Role-Based Access
+```tsx
+// app/layout.tsx
+<WagmiProvider>
+  <VLayerProvider>
+    <ThemeProvider>
+      <UserTypeProvider>
+        <RoleBasedLayout>
+          {children}
+        </RoleBasedLayout>
+      </UserTypeProvider>
+    </ThemeProvider>
+  </VLayerProvider>
+</WagmiProvider>
+```
+
+### Role-Based Component Architecture
+
+#### Shared Components with Variants
+```tsx
+interface TokenCardProps {
+  token: CreatorToken;
+  variant: 'influencer-manage' | 'fan-discover' | 'fan-portfolio';
+  onAction?: (action: string) => void;
+}
+
+export function TokenCard({ token, variant, onAction }: TokenCardProps) {
+  switch (variant) {
+    case 'influencer-manage':
+      return <InfluencerTokenCard token={token} onAction={onAction} />;
+    case 'fan-discover':
+      return <FanDiscoveryCard token={token} onAction={onAction} />;
+    case 'fan-portfolio':
+      return <FanPortfolioCard token={token} onAction={onAction} />;
+  }
+}
+```
+
+#### User Type Detection and Routing
+```tsx
+// middleware.ts
+export function middleware(request: NextRequest) {
+  const userType = request.cookies.get('user-type')?.value;
+  
+  // Redirect based on user type and route
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    if (userType === 'influencer') {
+      return NextResponse.redirect(new URL('/influencer/dashboard', request.url));
+    } else if (userType === 'fan') {
+      return NextResponse.redirect(new URL('/fan/portfolio', request.url));
+    }
+  }
+}
+```
+
+### User Onboarding Flows
+
+#### Role Selection Landing Page
+```tsx
+export function RoleSelectionPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="grid md:grid-cols-2 gap-8 max-w-4xl">
+        <RoleCard
+          type="influencer"
+          title="I'm a Creator"
+          description="Launch your social token and monetize your community"
+          features={["Create custom tokens", "Set earning rules", "Track analytics"]}
+          cta="Start Creating"
+        />
+        <RoleCard
+          type="fan"
+          title="I'm a Fan"
+          description="Support your favorite creators and earn exclusive tokens"
+          features={["Discover creators", "Earn through engagement", "Build portfolio"]}
+          cta="Start Supporting"
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+### Responsive Design by User Type
+
+#### Influencer (Dashboard-First)
+- **Desktop**: Multi-column dashboard with detailed analytics
+- **Tablet**: Responsive grid with collapsible sidebars
+- **Mobile**: Simplified metrics with swipe navigation
+
+#### Fan (Mobile-First)
+- **Mobile**: Card-based feed, thumb-friendly interactions
+- **Tablet**: Two-column discovery grid
+- **Desktop**: Three-column layout with persistent discovery sidebar
+
+### Performance Optimization by Role
+
+#### Code Splitting by User Type
+```tsx
+// Dynamic imports based on user role
+const InfluencerDashboard = dynamic(() => import('./influencer/dashboard'), {
+  loading: () => <InfluencerDashboardSkeleton />
+});
+
+const FanDiscovery = dynamic(() => import('./fan/discovery'), {
+  loading: () => <FanDiscoverySkeleton />
+});
+
+// Role-based component loading
+function AppContent({ userType }: { userType: 'influencer' | 'fan' }) {
+  if (userType === 'influencer') {
+    return <InfluencerDashboard />;
+  }
+  return <FanDiscovery />;
+}
+```
+
+### Testing Strategy by User Type
+
+#### Role-Based Testing
+```tsx
+describe('TokenCard Component', () => {
+  describe('Influencer variant', () => {
+    it('should show management controls', () => {
+      render(<TokenCard token={mockToken} variant="influencer-manage" />);
+      expect(screen.getByText('Edit Rules')).toBeInTheDocument();
+      expect(screen.getByText('View Analytics')).toBeInTheDocument();
+    });
+  });
+  
+  describe('Fan variant', () => {
+    it('should show earning opportunities', () => {
+      render(<TokenCard token={mockToken} variant="fan-discover" />);
+      expect(screen.getByText('Earn Tokens')).toBeInTheDocument();
+      expect(screen.getByText('Follow to Earn')).toBeInTheDocument();
+    });
+  });
+});
+```
+
+### Development Workflow
+
+#### Feature Development by User Type
+1. **Design**: Create role-specific mockups and user flows
+2. **Plan**: Identify shared vs. unique components
+3. **Build**: Implement with role-based variations
+4. **Test**: Test both user perspectives and edge cases
+5. **Review**: UX review from both influencer and fan viewpoints
+6. **Deploy**: Feature flags for gradual rollout by user type
+
+This dual-perspective architecture ensures that both influencers and fans have optimized, role-appropriate experiences while maintaining code efficiency through shared components and infrastructure.

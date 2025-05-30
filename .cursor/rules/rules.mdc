@@ -11,16 +11,22 @@ globs:
 alwaysApply: true
 ---
 
-## Project: PropenenTLS
+## Project: Propellant
 
 ### Overview
-PropenenTLS is a decentralized protocol for creators to launch personal tokens that fans can earn or purchase based on real engagement. Fan actions on X (e.g., likes, follows) are verified through ZK-TLS proofs in-browser and attested via vLayer. The system supports both crypto-native and non-crypto users through off-chain attestations, enabling a more accessible creator economy.
+Propellant is a token launcher platform designed specifically for influencers and content creators across well-known platforms. It enables creators to launch their own custom tokens and build deeper engagement with their fan base.
+
+Using Propellant, influencers can issue personal tokens that fans earn by engaging with their content — watching, liking, or sharing. These activities are verified using ZK-TLS proofs to ensure authenticity and privacy. Fans can trade these tokens for exclusive rewards, while early supporters and investors can back creators before they hit the mainstream.
+
+The platform transforms fan interaction into a dynamic investment ecosystem. It empowers creators to grow sustainable communities and gives fans the chance to hold and gain "stock" in their favorite influencers.
+
+**It's Simple. Secure. Social investing.**
 
 ### Problem Statement
-Engagement with creators on traditional platforms is not verifiable or rewarded. Web3 creator tools are often gated behind crypto onboarding, excluding non-technical or non-wallet users. There is a need for trustless engagement verification and broader accessibility.
+Traditional fan engagement with creators lacks verifiable rewards and investment opportunities. Fans cannot directly benefit from supporting their favorite creators before they become mainstream. There's a need for a secure, accessible platform that transforms social interaction into meaningful economic participation.
 
 ### Proposed Solution
-PropenenTLS allows creators to deploy cross-chain tokens and define custom gating and earning rules. Fan engagement on X is verified using ZK-TLS, then attested through vLayer. Fans can claim tokens for activity or purchase them without crypto, using banking-based attestations (e.g., Revolut). LayerZero ensures all tokens are OFTs, and Flow supports additional deployment.
+Propellant allows creators to launch personal tokens with custom earning and trading rules. Fan engagement across platforms is verified using ZK-TLS proofs, ensuring authentic interactions while maintaining privacy. The system supports both crypto-native and mainstream users through accessible onboarding. Early supporters can invest in creators' tokens, creating a social investment ecosystem where fans become stakeholders in their favorite influencers' success.
 
 ### Technical Stack
 - **Smart Contracts**: Solidity (ERC-20/OFT, attestation-based access, bonding), Cadence (Flow support)
@@ -46,7 +52,7 @@ PropenenTLS allows creators to deploy cross-chain tokens and define custom gatin
   - Token factory and creator logic deployed to Flow for easy integration with apps targeting mainstream users and consumer contexts.
 
 ### Impact
-PropenenTLS bridges real-world social interaction with verifiable, decentralized value transfer. It lowers onboarding friction for fans by removing the need for wallets or tokens upfront, while empowering creators with configurable, attestable economies.
+Propellant bridges real-world social interaction with verifiable, decentralized value transfer. It lowers onboarding friction for fans by removing the need for wallets or tokens upfront, while empowering creators with configurable, attestable economies.
 
 ### Future Plans
 - Add more Web2 platforms beyond X
