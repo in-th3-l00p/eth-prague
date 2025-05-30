@@ -216,34 +216,40 @@ export default function FanDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="mx-auto max-w-4xl px-6">
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => router.push('/dashboard')}
-                className="h-8 w-8 text-gray-600 hover:text-black"
+                className="mr-2"
               >
-                <ArrowLeftIcon className="h-4 w-4" />
+                <ArrowLeftIcon className="h-5 w-5" />
               </Button>
               <Link href="/fan" className="flex items-center space-x-3">
-                <span className="text-xl font-medium text-black">Discover</span>
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">P</span>
+                </div>
+                <span className="text-lg font-bold text-gray-900">Fan Mode</span>
               </Link>
             </div>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200">
-                  <span className="text-sm font-medium text-gray-700">
-                    {user.email?.charAt(0).toUpperCase()}
-                  </span>
+                <Button variant="ghost" size="icon" className="-m-1.5 p-1.5 aspect-square">
+                  <span className="sr-only">Open user menu</span>
+                  <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center aspect-square">
+                    <span className="text-white font-semibold text-sm">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="end" className="w-32">
                 <DropdownMenuItem onClick={() => router.push('/dashboard')}>
                   Switch Mode
                 </DropdownMenuItem>
@@ -256,7 +262,17 @@ export default function FanDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-8">
+      <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Discover</h1>
+              <p className="mt-2 text-gray-600">Explore and invest in creator tokens</p>
+            </div>
+          </div>
+        </div>
+
         {/* Operation Buttons */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
@@ -287,7 +303,7 @@ export default function FanDashboard() {
           </div>
           
           <Button 
-            className="h-9 px-4 bg-black text-white hover:bg-gray-800"
+            className="h-9 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
           >
             <EyeIcon className="w-4 h-4 mr-2" />
             Your Tokens
@@ -297,13 +313,13 @@ export default function FanDashboard() {
         {/* Social Feed */}
         <div className="space-y-6">
           {influencerFeed.map((influencer) => (
-            <div key={influencer.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div key={influencer.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               {/* Post Header */}
               <div className="p-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-                      <span className="text-lg font-medium text-gray-700">{influencer.avatar}</span>
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center">
+                      <span className="text-lg font-medium text-purple-700">{influencer.avatar}</span>
                     </div>
                     <div>
                       <div className="flex items-center space-x-2">
@@ -331,7 +347,7 @@ export default function FanDashboard() {
                       "h-8 px-3",
                       influencer.isFollowing 
                         ? "border-gray-300 text-gray-700 hover:bg-gray-50" 
-                        : "bg-black text-white hover:bg-gray-800"
+                        : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                     )}
                   >
                     <UserPlusIcon className="w-4 h-4 mr-1" />
@@ -345,11 +361,11 @@ export default function FanDashboard() {
                 <p className="text-gray-900 mb-4">{influencer.post.content}</p>
                 
                 {/* Token Info Card */}
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mb-4 border border-purple-100">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-xs font-medium text-gray-700">{influencer.tokenSymbol.charAt(0)}</span>
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                        <span className="text-xs font-medium text-white">{influencer.tokenSymbol.charAt(0)}</span>
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
@@ -376,7 +392,7 @@ export default function FanDashboard() {
                           "h-8 px-3",
                           influencer.hasToken 
                             ? "bg-green-600 text-white hover:bg-green-700" 
-                            : "bg-black text-white hover:bg-gray-800"
+                            : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                         )}
                       >
                         {influencer.hasToken ? 'Holding' : 'Buy'}
@@ -437,7 +453,7 @@ export default function FanDashboard() {
 
         {/* Load More */}
         <div className="text-center mt-8">
-          <Button variant="outline" className="px-8">
+          <Button variant="outline" className="px-8 border-purple-200 text-purple-700 hover:bg-purple-50">
             Load More Posts
           </Button>
         </div>
