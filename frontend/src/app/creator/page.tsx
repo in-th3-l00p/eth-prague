@@ -140,9 +140,9 @@ export default function CreatorDashboard() {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="-m-1.5 p-1.5">
+                <Button variant="ghost" size="icon" className="-m-1.5 p-1.5 aspect-square">
                   <span className="sr-only">Open user menu</span>
-                  <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                  <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center aspect-square">
                     <span className="text-white font-semibold text-sm">
                       {user.email?.charAt(0).toUpperCase()}
                     </span>
