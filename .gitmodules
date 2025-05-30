@@ -1,0 +1,3 @@
+[submodule "influence-proof/lib/forge-std"]
+	path = influence-proof/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
