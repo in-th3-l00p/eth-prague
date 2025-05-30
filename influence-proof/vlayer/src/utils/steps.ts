@@ -1,10 +1,10 @@
 import {
   ConnectWalletStep,
   MintStep,
-  ProveStep,
+  ProveAccountStep,
+  ProveEngagementStep,
   SuccessStep,
   WelcomeScreen,
-  InstallExtension,
 } from "../components";
 
 export type Step = {
@@ -21,9 +21,9 @@ export type Step = {
 export enum STEP_KIND {
   WELCOME,
   CONNECT_WALLET,
-  START_PROVING,
+  START_PROVING_ACCOUNT,
+  START_PROVING_ENGAGEMENT,
   MINT,
-  INSTALL_EXTENSION,
   SUCCESS,
 }
 export const steps: Step[] = [
@@ -40,7 +40,7 @@ export const steps: Step[] = [
   {
     path: "connect-wallet",
     kind: STEP_KIND.CONNECT_WALLET,
-    backUrl: "",
+    backUrl: "/",
     component: ConnectWalletStep,
     title: "X NFT",
     description:
@@ -48,32 +48,33 @@ export const steps: Step[] = [
     index: 1,
   },
   {
-    path: "start-proving",
-    kind: STEP_KIND.START_PROVING,
+    path: "start-proving-account",
+    kind: STEP_KIND.START_PROVING_ACCOUNT,
     backUrl: "/connect-wallet",
-    component: ProveStep,
+    component: ProveAccountStep,
     title: "X NFT",
     description:
       "Open vlayer browser extension and follow instructions in order to produce the Proof of X account ownership. \n",
     index: 2,
   },
   {
-    path: "install-extension",
-    kind: STEP_KIND.INSTALL_EXTENSION,
-    component: InstallExtension,
-    backUrl: "/connect-wallet",
+    path: "start-proving-engagement",
+    kind: STEP_KIND.START_PROVING_ENGAGEMENT,
+    backUrl: "/start-proving-account",
+    component: ProveEngagementStep,
     title: "X NFT",
-    description: `Install vlayer browser extension to proceed to the next step. \n`,
-    index: 2,
+    description:
+      "Open vlayer browser extension and follow instructions in order to produce the Proof of X account ownership. \n",
+    index: 3,
   },
   {
     path: "mint",
     kind: STEP_KIND.MINT,
-    backUrl: "/start-proving",
+    backUrl: "/start-proving-engagement",
     component: MintStep,
     title: "X NFT",
     description: `You are all set to mint your unique X NFT, a true reflection of your verified identity.`,
-    index: 3,
+    index: 4,
   },
   {
     path: "success",
@@ -82,6 +83,6 @@ export const steps: Step[] = [
     title: "Success",
     description: "",
     headerIcon: "/success-illustration.svg",
-    index: 4,
+    index: 5,
   },
 ];

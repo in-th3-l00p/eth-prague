@@ -17,10 +17,15 @@ export const ProgressBar = () => {
       <li
         className={`step ${currentStep?.index !== undefined && currentStep?.index >= 2 ? "step-primary" : ""} text-black text-xs`}
       >
-        Get data from X
+        Prove Account
       </li>
       <li
         className={`step ${currentStep?.index !== undefined && currentStep?.index >= 3 ? "step-primary" : ""} text-black text-xs`}
+      >
+        Prove Engagement
+      </li>
+      <li
+        className={`step ${currentStep?.index !== undefined && currentStep?.index >= 4 ? "step-primary" : ""} text-black text-xs`}
       >
         Mint NFT
       </li>

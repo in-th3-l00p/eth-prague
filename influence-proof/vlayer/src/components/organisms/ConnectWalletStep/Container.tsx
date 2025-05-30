@@ -17,7 +17,7 @@ const useConnectWallet = () => {
 
   const next = useCallback(() => {
     if (hasExtensionInstalled) {
-      void navigate("/start-proving");
+      void navigate("/start-proving-account");
     } else {
       void navigate("/install-extension");
     }

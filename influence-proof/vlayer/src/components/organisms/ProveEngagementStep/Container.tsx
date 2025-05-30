@@ -4,7 +4,7 @@ import { useTwitterAccountProof } from "../../../hooks/useTwitterAccountProof";
 import { ProveStepPresentational } from "./Presentational";
 import { useAccount } from "wagmi";
 
-export const ProveStep = () => {
+export const ProveEngagementStep = () => {
   const navigate = useNavigate();
   const { address } = useAccount();
   const [disabled, setDisabled] = useState(false);
@@ -28,7 +28,7 @@ export const ProveStep = () => {
 
   useEffect(() => {
     if (result) {
-      void navigate("/mint");
+      void navigate("/start-proving-engagement");
     }
   }, [result, navigate]);
 
