@@ -11,7 +11,7 @@
     "docker:logs": "docker compose --file docker-compose.devnet.yaml logs -f",
     "docker:status": "docker ps --format \"table {{.Names}}\\t{{.Status}}\\t{{.Ports}}\"",
     "micros:dev": "node scripts/dev-all-micros.js",
-    "micros:dev:legacy": "concurrently -n \"token-gen,x-account,x-onramp\" -c \"cyan,magenta,yellow\" \"cd micros/token-generator/vlayer && bun run web:dev\" \"cd micros/x-account-proof/vlayer && bun run web:dev\" \"cd micros/x-onramp-proof/vlayer && bun run web:dev\"",
+    "micros:dev:legacy": "concurrently -n \"token-gen,x-account,onramp\" -c \"cyan,magenta,yellow\" \"cd micros/token-generator/vlayer && bun run web:dev\" \"cd micros/x-account-proof/vlayer && bun run web:dev\" \"cd micros/onramp-proof/vlayer && bun run web:dev\"",
     "dev": "npm run docker:up && node scripts/wait-for-docker.js && npm run micros:dev",
     "dev:concurrent": "concurrently -n \"docker,wait,micros\" -c \"blue,gray,green\" \"npm run docker:up\" \"npm run wait-for-docker\" \"npm run micros:dev\"",
     "restart": "npm run clean && npm run dev",
