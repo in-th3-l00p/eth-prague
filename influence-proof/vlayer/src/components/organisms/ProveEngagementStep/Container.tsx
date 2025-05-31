@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTwitterAccountProof } from "../../../hooks/useTwitterAccountProof";
-import { ProveStepPresentational } from "./Presentational";
+import { ProveStepPresentational } from "../../molecules/Presentational";
 import { useAccount } from "wagmi";
 
 export const ProveEngagementStep = () => {
@@ -28,7 +28,7 @@ export const ProveEngagementStep = () => {
 
   useEffect(() => {
     if (result) {
-      void navigate("/start-proving-engagement");
+      void navigate("/mint");
     }
   }, [result, navigate]);
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTwitterAccountProof } from "../../../hooks/useTwitterAccountProof";
-import { ProveStepPresentational } from "./Presentational";
+import { ProveStepPresentational } from "../../molecules/Presentational";
 import { useAccount } from "wagmi";
 
 export const ProveAccountStep = () => {
