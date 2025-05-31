@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useTwitterAccountProof } from "../../../hooks/useTwitterAccountProof";
 import { ProveFollowersPresentational } from "./Presentational";
 import { useAccount } from "wagmi";
+import {useTwitterFollowersProof} from "../../../hooks/useTwitterFollowersProof.ts";
 
 export const ProveFollowersStep = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export const ProveFollowersStep = () => {
     isCallProverIdle,
     result,
     error,
-  } = useTwitterAccountProof();
+  } = useTwitterFollowersProof(window.location.search.split("=")[1]);
 
   useEffect(() => {
     if (webProof && isCallProverIdle) {
@@ -28,7 +29,7 @@ export const ProveFollowersStep = () => {
 
   useEffect(() => {
     if (result) {
-      void navigate("/start-followers-count-proving");
+      void navigate("/success");
     }
   }, [result, navigate]);
 

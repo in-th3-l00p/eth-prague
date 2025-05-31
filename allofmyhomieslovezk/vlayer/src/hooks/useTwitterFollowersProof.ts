@@ -32,7 +32,7 @@ export const useTwitterFollowersProof = (screenName: string) => {
           { domElement: "body", require: { exist: true } }
       ),
       notarize(
-          `https://x.com/i/api/graphql/xWw45l6nX7DP2FKRyePXSw/UserByScreenName?variables=%7B%22screen_name%22%3A%22georgetisc84245%22%7D&features=%7B%22hidden_profile_subscriptions_enabled%22%3Atrue%2C%22profile_label_improvements_pcf_label_in_post_enabled%22%3Atrue%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22subscriptions_verification_info_is_identity_verified_enabled%22%3Atrue%2C%22subscriptions_verification_info_verified_since_enabled%22%3Atrue%2C%22highlights_tweets_tab_ui_enabled%22%3Atrue%2C%22responsive_web_twitter_article_notes_tab_enabled%22%3Atrue%2C%22subscriptions_feature_can_gift_premium%22%3Atrue%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%7D&fieldToggles=%7B%22withAuxiliaryUserLabels%22%3Atrue%7D`,
+          `https://x.com/i/api/graphql/xWw45l6nX7DP2FKRyePXSw/UserByScreenName?variables=%7B%22screen_name%22%3A%22${screenName.toLowerCase()}%22%7D&features=%7B%22hidden_profile_subscriptions_enabled%22%3Atrue%2C%22profile_label_improvements_pcf_label_in_post_enabled%22%3Atrue%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22subscriptions_verification_info_is_identity_verified_enabled%22%3Atrue%2C%22subscriptions_verification_info_verified_since_enabled%22%3Atrue%2C%22highlights_tweets_tab_ui_enabled%22%3Atrue%2C%22responsive_web_twitter_article_notes_tab_enabled%22%3Atrue%2C%22subscriptions_feature_can_gift_premium%22%3Atrue%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%7D&fieldToggles=%7B%22withAuxiliaryUserLabels%22%3Atrue%7D`,
           "GET",
           "Generate Proof of Twitter profile data",
           [
@@ -119,9 +119,11 @@ export const useTwitterFollowersProof = (screenName: string) => {
   useEffect(() => {
     if (result) {
       console.log("proverResult", result);
-      setProverResult(JSON.stringify(result));
+      setProverResult(JSON.stringify({
+        followers: Number.parseInt(((result as any[])[1] as bigint).toString())
+      }));
     }
-  }, [JSON.stringify(result)]);
+  }, [result]);
 
   return {
     requestWebProof,

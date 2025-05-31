@@ -6,6 +6,7 @@ import {
   WelcomeScreen,
   InstallExtension,
 } from "../components";
+import {ProveScreenNameStep} from "../components/organisms/ProveScreenFollowersStep";
 
 export type Step = {
   kind: STEP_KIND;
@@ -60,7 +61,7 @@ export const steps: Step[] = [
     path: "start-screen-name-proving",
     kind: STEP_KIND.START_SCREEN_NAME_PROVING,
     backUrl: "/connect-wallet",
-    component: ProveFollowersStep,
+    component: ProveScreenNameStep,
     title: "Screen name proving",
     description:
       "Open vlayer browser extension and follow instructions in order to produce the Proof of X account ownership. \n",

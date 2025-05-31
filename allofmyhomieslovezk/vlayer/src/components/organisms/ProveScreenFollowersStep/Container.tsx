@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useTwitterAccountProof } from "../../../hooks/useTwitterAccountProof";
 import { ProveScreenNamePresentational } from "./Presentational";
 import { useAccount } from "wagmi";
+import {useTwitterFollowersProof} from "../../../hooks/useTwitterFollowersProof.ts";
 
 export const ProveScreenNameStep = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export const ProveScreenNameStep = () => {
 
   useEffect(() => {
     if (result) {
-      void navigate("/start-followers-count-proving");
+      void navigate(`/start-followers-count-proving?screenName=${result[1]}`);
     }
   }, [result, navigate]);
 
