@@ -341,8 +341,12 @@ export default function CreatorDashboard() {
                   alert('Please connect your wallet first to launch a new token.')
                   return
                 }
-                // Add token launch logic here
-                console.log('Launching new token...')
+                // Navigate to localhost:5174 with screen_name parameter
+                if (accountProof?.screen_name) {
+                  window.open(`http://localhost:5174?screen_name=${encodeURIComponent(accountProof.screen_name)}`, '_blank')
+                } else {
+                  alert('Screen name not found. Please verify your account first.')
+                }
               }}
             >
               <PlusIcon className="w-5 h-5 mr-2" />

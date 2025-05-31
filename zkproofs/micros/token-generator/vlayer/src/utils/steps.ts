@@ -31,10 +31,9 @@ export const steps: Step[] = [
     path: "",
     kind: STEP_KIND.WELCOME,
     component: WelcomeScreen,
-    title: "X NFT",
+    title: "Launch a Token",
     description:
-      "Mint an NFT with your X account. Only owner of account can mint NFT for specific handle. This example demonstrates use of Web Proofs.",
-    headerIcon: "/nft-illustration.svg",
+      "Proof that you are relevant enough to launch a token, and boost your profile by launching one.",
     index: 0,
   },
   {
@@ -42,7 +41,7 @@ export const steps: Step[] = [
     kind: STEP_KIND.CONNECT_WALLET,
     backUrl: "",
     component: ConnectWalletStep,
-    title: "X NFT",
+    title: "Connect Wallet",
     description:
       "To proceed to the next step, please connect your wallet now by clicking the button below.",
     index: 1,
@@ -52,9 +51,9 @@ export const steps: Step[] = [
     kind: STEP_KIND.START_PROVING,
     backUrl: "/connect-wallet",
     component: ProveStep,
-    title: "X NFT",
+    title: "Proof of Relevance",
     description:
-      "Open vlayer browser extension and follow instructions in order to produce the Proof of X account ownership. \n",
+      "Open vlayer browser extension and follow instructions in order to produce the Proof of Relevance. \n",
     index: 2,
   },
   {
@@ -62,7 +61,7 @@ export const steps: Step[] = [
     kind: STEP_KIND.INSTALL_EXTENSION,
     component: InstallExtension,
     backUrl: "/connect-wallet",
-    title: "X NFT",
+    title: "Launch a token",
     description: `Install vlayer browser extension to proceed to the next step. \n`,
     index: 2,
   },
@@ -71,8 +70,8 @@ export const steps: Step[] = [
     kind: STEP_KIND.MINT,
     backUrl: "/start-proving",
     component: MintStep,
-    title: "X NFT",
-    description: `You are all set to mint your unique X NFT, a true reflection of your verified identity.`,
+    title: "Launch a token",
+    description: `You are all set to launch your unique token, a true reflection of your verified identity.`,
     index: 3,
   },
   {
@@ -80,8 +79,7 @@ export const steps: Step[] = [
     kind: STEP_KIND.SUCCESS,
     component: SuccessStep,
     title: "Success",
-    description: "",
-    headerIcon: "/success-illustration.svg",
+    description: "You have successfully launched your token.",
     index: 4,
   },
 ];

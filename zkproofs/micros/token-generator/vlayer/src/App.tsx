@@ -10,6 +10,8 @@ import { Chain } from "viem";
 import { ErrorBoundary } from "react-error-boundary";
 import { AppErrorBoundaryComponent } from "./components/layout/ErrorBoundary";
 import { getChainSpecs } from "@vlayer/sdk";
+import { useEffect } from "react";
+import { extractScreenNameFromUrl, setXScreenName, getXScreenName } from "./utils/localStorage";
 
 const queryClient = new QueryClient();
 const appKitProjectId = `0716afdbbb2cc3df69721a879b92ad5b`;
@@ -55,6 +57,25 @@ createAppKit({
 });
 
 const App = () => {
+  // Extract and store X screen name from URL parameters
+  useEffect(() => {
+    const screenNameFromUrl = extractScreenNameFromUrl();
+    
+    if (screenNameFromUrl) {
+      // Store in localStorage for later use
+      setXScreenName(screenNameFromUrl);
+      console.log(`X screen name stored: ${screenNameFromUrl}`);
+    } else {
+      // Check if we already have a screen name in localStorage
+      const storedScreenName = getXScreenName();
+      if (storedScreenName) {
+        console.log(`Using stored X screen name: ${storedScreenName}`);
+      } else {
+        console.warn('No X screen name provided in URL parameters. Expected: ?screenName=username');
+      }
+    }
+  }, []);
+
   return (
     <div id="app">
       <WagmiProvider config={wagmiAdapter.wagmiConfig}>
