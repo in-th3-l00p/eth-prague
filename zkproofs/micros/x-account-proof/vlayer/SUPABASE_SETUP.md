@@ -26,8 +26,9 @@ VLAYER_ENV=dev
 
 ## Database Schema
 
-You'll need to create the following table in your Supabase database:
+You'll need to create the following tables in your Supabase database:
 
+### Account Proofs Table
 ```sql
 -- Account proofs table
 CREATE TABLE account_proofs (
@@ -57,6 +58,40 @@ CREATE POLICY "Users can insert own account proofs" ON account_proofs
 CREATE POLICY "Users can update own account proofs" ON account_proofs
   FOR UPDATE USING (auth.uid() = user_id);
 ```
+
+### Screenname Validator Table
+```sql
+-- Screenname validator table for storing deployed verifier contract addresses
+CREATE TABLE screenname_validator (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  contract_address TEXT NOT NULL UNIQUE,
+  prover_address TEXT,
+  chain_name TEXT NOT NULL,
+  deployed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for better performance
+CREATE INDEX idx_screenname_validator_contract_address ON screenname_validator(contract_address);
+CREATE INDEX idx_screenname_validator_chain_name ON screenname_validator(chain_name);
+
+-- Enable RLS
+ALTER TABLE screenname_validator ENABLE ROW LEVEL SECURITY;
+
+-- Allow read access to all users
+CREATE POLICY "Allow read access to screenname_validator" ON screenname_validator
+  FOR SELECT USING (true);
+
+-- Allow insert/update for contract deployment
+CREATE POLICY "Allow insert to screenname_validator" ON screenname_validator
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow update to screenname_validator" ON screenname_validator
+  FOR UPDATE USING (true);
+```
+
+**Note:** You can run the complete database setup by executing the SQL file at `vlayer/database-setup.sql` in your Supabase SQL editor.
 
 ## Authentication URLs
 
@@ -137,6 +172,64 @@ function ProofComponent() {
 }
 ```
 
+### Managing Verifier Contracts
+```tsx
+import { db } from './lib/supabase'
+
+function ContractManager() {
+  const saveVerifierContract = async (contractAddress: string, proverAddress: string, chainName: string) => {
+    const { data, error } = await db.saveVerifierContract({
+      contract_address: contractAddress,
+      prover_address: proverAddress,
+      chain_name: chainName,
+      deployed_at: new Date().toISOString()
+    })
+
+    if (error) {
+      console.error('Failed to save verifier contract:', error)
+    } else {
+      console.log('Verifier contract saved successfully:', data)
+    }
+  }
+
+  const getLatestVerifier = async (chainName: string) => {
+    const { data, error } = await db.getLatestVerifierContract(chainName)
+    
+    if (error) {
+      console.error('Failed to get latest verifier:', error)
+    } else {
+      console.log('Latest verifier contract:', data)
+      return data?.contract_address
+    }
+  }
+
+  const getAllVerifiers = async (chainName: string) => {
+    const { data, error } = await db.getVerifierContractsByChain(chainName)
+    
+    if (error) {
+      console.error('Failed to get verifiers:', error)
+    } else {
+      console.log('All verifier contracts:', data)
+      return data
+    }
+  }
+
+  return (
+    <div>
+      <button onClick={() => saveVerifierContract('0x123...', '0x456...', 'testnet')}>
+        Save Contract
+      </button>
+      <button onClick={() => getLatestVerifier('testnet')}>
+        Get Latest Verifier
+      </button>
+      <button onClick={() => getAllVerifiers('testnet')}>
+        Get All Verifiers
+      </button>
+    </div>
+  )
+}
+```
+
 ### OAuth Authentication
 ```tsx
 import { useAuth } from './hooks/useAuth'
@@ -162,21 +255,23 @@ function OAuthLogin() {
 
 ## Features
 
-✅ **Client-side authentication** - Optimized for Vite + React + Bun
-✅ **Persistent sessions** - Sessions persist across browser reloads
-✅ **OAuth support** - Google, GitHub, Discord, Twitter
-✅ **TypeScript support** - Fully typed with proper interfaces
-✅ **Database helpers** - Built-in functions for account proof operations
-✅ **Error handling** - Comprehensive error management
-✅ **Custom storage key** - Isolated auth storage for this micro frontend
+✅ **Client-side authentication** - Optimized for Vite + React + Bun  
+✅ **Persistent sessions** - Sessions persist across browser reloads  
+✅ **OAuth support** - Google, GitHub, Discord, Twitter  
+✅ **TypeScript support** - Fully typed with proper interfaces  
+✅ **Database helpers** - Built-in functions for account proof and verifier contract operations  
+✅ **Error handling** - Comprehensive error management  
+✅ **Custom storage key** - Isolated auth storage for this micro frontend  
+✅ **Contract management** - Store and retrieve verifier contract addresses  
 
 ## Integration with vLayer
 
 This Supabase setup is designed to work alongside your vLayer proof generation. The typical flow would be:
 
-1. User signs in with Supabase
-2. User generates zkTLS proof with vLayer
-3. Proof data is saved to Supabase database
-4. User can view their verification status
+1. **Contract Deployment**: When contracts are deployed via `bun run deploy.ts`, verifier addresses are automatically saved to Supabase
+2. **User Authentication**: User signs in with Supabase  
+3. **Proof Generation**: User generates zkTLS proof with vLayer using the stored verifier contracts
+4. **Data Persistence**: Proof data is saved to Supabase database  
+5. **Status Tracking**: User can view their verification status
 
-The authentication state persists across the entire verification flow, providing a seamless user experience. 
+The authentication state and contract addresses persist across the entire verification flow, providing a seamless user experience.
