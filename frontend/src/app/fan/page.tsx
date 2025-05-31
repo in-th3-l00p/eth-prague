@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { WalletConnect } from '@/components/WalletConnect'
 import { 
   MagnifyingGlassIcon,
   ArrowLeftIcon,
@@ -16,9 +17,11 @@ import {
   ShareIcon,
   EyeIcon,
   ChartBarIcon,
-  UserPlusIcon
+  UserPlusIcon,
+  WalletIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
+import { useAccount } from 'wagmi'
 
 const influencerFeed = [
   {
@@ -58,7 +61,6 @@ const influencerFeed = [
     marketCap: '$45,123',
     holders: 1234,
     post: {
-      content: "Building in public day 47: My AI startup just hit $1M ARR! Token holders are getting exclusive access to our beta features 💎",
       image: null,
       timestamp: '4h',
       likes: 2341,
@@ -151,8 +153,12 @@ export default function FanDashboard() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set())
+  const [purchasingToken, setPurchasingToken] = useState<number | null>(null)
   const router = useRouter()
   const supabase = createClient()
+
+  // Wallet connection hooks
+  const { isConnected } = useAccount()
 
   useEffect(() => {
     const getUser = async () => {
@@ -189,6 +195,28 @@ export default function FanDashboard() {
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push('/')
+  }
+
+  const handleTokenPurchase = async (influencerId: number, tokenSymbol: string) => {
+    if (!isConnected) {
+      return
+    }
+
+    setPurchasingToken(influencerId)
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      console.log(`Purchasing ${tokenSymbol} token for influencer ${influencerId}`)
+
+      alert(`Successfully purchased ${tokenSymbol} token!`)
+      
+    } catch (error) {
+      console.error('Token purchase failed:', error)
+      alert('Token purchase failed. Please try again.')
+    } finally {
+      setPurchasingToken(null)
+    }
   }
 
   const toggleLike = (postId: number) => {
@@ -238,26 +266,31 @@ export default function FanDashboard() {
               </Link>
             </div>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="-m-1.5 p-1.5 aspect-square">
-                  <span className="sr-only">Open user menu</span>
-                  <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center aspect-square">
-                    <span className="text-white font-semibold text-sm">
-                      {user.email?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-                  Switch Mode
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center space-x-4">
+              {/* Wallet Connection */}
+              <WalletConnect variant="gradient" showBalance={true} />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="-m-1.5 p-1.5 aspect-square">
+                    <span className="sr-only">Open user menu</span>
+                    <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center aspect-square">
+                      <span className="text-white font-semibold text-sm">
+                        {user.email?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32">
+                  <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                    Switch Mode
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>
@@ -268,7 +301,14 @@ export default function FanDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Discover</h1>
-              <p className="mt-2 text-gray-600">Explore and invest in creator tokens</p>
+              <p className="mt-2 text-gray-600">
+                Explore and invest in creator tokens
+                {!isConnected && (
+                  <span className="block text-sm text-orange-600 mt-1">
+                    Connect your wallet to purchase tokens
+                  </span>
+                )}
+              </p>
             </div>
           </div>
         </div>
@@ -388,6 +428,8 @@ export default function FanDashboard() {
                       </span>
                       <Button 
                         size="sm" 
+                        onClick={() => !influencer.hasToken && handleTokenPurchase(influencer.id, influencer.tokenSymbol)}
+                        disabled={purchasingToken === influencer.id}
                         className={classNames(
                           "h-8 px-3",
                           influencer.hasToken 
@@ -395,7 +437,21 @@ export default function FanDashboard() {
                             : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                         )}
                       >
-                        {influencer.hasToken ? 'Holding' : 'Buy'}
+                        {purchasingToken === influencer.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-2"></div>
+                            Buying...
+                          </>
+                        ) : influencer.hasToken ? (
+                          'Holding'
+                        ) : !isConnected ? (
+                          <>
+                            <WalletIcon className="w-3 h-3 mr-1" />
+                            Connect to Buy
+                          </>
+                        ) : (
+                          'Buy'
+                        )}
                       </Button>
                     </div>
                   </div>
