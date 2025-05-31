@@ -53,8 +53,26 @@ export default function Dashboard() {
     router.push('/')
   }
 
-  const handleCreatorMode = () => {
-    router.push('/creator')
+  const handleCreatorMode = async () => {
+    // Check if user has account proof first
+    try {
+      const { data: accountProof } = await supabase
+        .from('account_proofs')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      if (accountProof && accountProof.nft_address) {
+        // User is verified, go directly to creator dashboard
+        router.push('/creator')
+      } else {
+        // User needs verification, go to verification page
+        router.push('/creator/verify')
+      }
+    } catch (error) {
+      // If there's an error or no proof found, go to verification page
+      router.push('/creator/verify')
+    }
   }
 
   const handleFanMode = () => {

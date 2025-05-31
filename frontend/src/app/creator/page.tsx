@@ -63,6 +63,7 @@ function classNames(...classes: (string | undefined)[]) {
 export default function CreatorDashboard() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [accountProof, setAccountProof] = useState<any>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -77,6 +78,9 @@ export default function CreatorDashboard() {
         }
         
         setUser(user)
+        
+        // Check for account proof
+        await checkAccountProof(user.id)
       } catch (error) {
         console.error('Error fetching user:', error)
         router.push('/login')
@@ -92,11 +96,38 @@ export default function CreatorDashboard() {
         router.push('/login')
       } else if (session?.user) {
         setUser(session.user)
+        checkAccountProof(session.user.id)
       }
     })
 
     return () => subscription.unsubscribe()
   }, [supabase.auth, router])
+
+  const checkAccountProof = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('account_proofs')
+        .select('*')
+        .eq('user_id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        console.error('Error checking account proof:', error)
+        return
+      }
+
+      if (data && data.nft_address) {
+        setAccountProof(data)
+      } else {
+        // No valid account proof found, redirect to verification page
+        router.push('/creator/verify')
+        return
+      }
+    } catch (error) {
+      console.error('Error checking account proof:', error)
+      router.push('/creator/verify')
+    }
+  }
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -111,8 +142,8 @@ export default function CreatorDashboard() {
     )
   }
 
-  if (!user) {
-    return null
+  if (!user || !accountProof) {
+    return null // Will redirect to verification or login
   }
 
   return (
