@@ -61,27 +61,7 @@ export const Modal = ({ children }: { children: React.ReactNode }) => {
           exit={{ opacity: 0, scale: 0.1 }}
           transition={{ ease: "easeOut", duration: 0.3 }}
         >
-          {/* Navigation */}
-          <Navigation />
-          {/* Progress Bar */}
-          <AnimatePresence>
-            {!isWelcome && !isSuccessStep && <ProgressBar />}
-          </AnimatePresence>
           <ErrorBoundary FallbackComponent={StepErrorBoundaryComponent}>
-            {/* Header Icon */}
-            <AnimatePresence>
-              {currentStep?.headerIcon && (
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.1 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.1 }}
-                  transition={{ ease: "easeOut", duration: 0.3 }}
-                  src={currentStep?.headerIcon}
-                  alt="Success Icon"
-                  className="w-[282px] h-[150px]"
-                />
-              )}
-            </AnimatePresence>
             <div className="flex-col flex gap-4 justify-between h-[284px] mb-2">
               {/* Title */}
               {currentStep?.title && (

@@ -21,6 +21,7 @@ export type Step = {
 export enum STEP_KIND {
   WELCOME,
   CONNECT_WALLET,
+  INSTALL_EXTENSION,
   START_SCREEN_NAME_PROVING,
   START_FOLLOWERS_COUNT_PROVING,
   START_LAUNCHING,
@@ -47,6 +48,15 @@ export const steps: Step[] = [
     index: 1,
   },
   {
+    path: "install-extension",
+    kind: STEP_KIND.INSTALL_EXTENSION,
+    component: InstallExtension,
+    backUrl: "/connect-wallet",
+    title: "X NFT",
+    description: `Install vlayer browser extension to proceed to the next step. \n`,
+    index: 1,
+  },
+  {
     path: "start-screen-name-proving",
     kind: STEP_KIND.START_SCREEN_NAME_PROVING,
     backUrl: "/connect-wallet",
@@ -60,12 +70,12 @@ export const steps: Step[] = [
   {
     path: "start-followers-count-proving",
     kind: STEP_KIND.START_FOLLOWERS_COUNT_PROVING,
-    backUrl: "/connect-wallet",
+    backUrl: "/start-screen-name-proving",
     component: ProveStep,
     title: "Followers count proving",
     description: `Install vlayer browser extension to proceed to the next step. \n`,
     headerIcon: "/nft-illustration.svg",
-    index: 2,
+    index: 3,
   },
   {
     path: "start-launching",

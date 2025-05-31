@@ -17,7 +17,7 @@ const useConnectWallet = () => {
 
   const next = useCallback(() => {
     if (hasExtensionInstalled) {
-      void navigate("/start-proving");
+      void navigate("/start-screen-name-proving");
     } else {
       void navigate("/install-extension");
     }
