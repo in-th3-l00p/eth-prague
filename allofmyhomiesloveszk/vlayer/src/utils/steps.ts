@@ -1,7 +1,7 @@
 import {
   ConnectWalletStep,
   LaunchStep,
-  ProveStep,
+  ProveScreenNameStep,
   SuccessStep,
   WelcomeScreen,
   InstallExtension,
@@ -60,7 +60,7 @@ export const steps: Step[] = [
     path: "start-screen-name-proving",
     kind: STEP_KIND.START_SCREEN_NAME_PROVING,
     backUrl: "/connect-wallet",
-    component: ProveStep,
+    component: ProveScreenNameStep,
     title: "Screen name proving",
     description:
       "Open vlayer browser extension and follow instructions in order to produce the Proof of X account ownership. \n",
@@ -71,7 +71,7 @@ export const steps: Step[] = [
     path: "start-followers-count-proving",
     kind: STEP_KIND.START_FOLLOWERS_COUNT_PROVING,
     backUrl: "/start-screen-name-proving",
-    component: ProveStep,
+    component: ProveScreenNameStep,
     title: "Followers count proving",
     description: `Install vlayer browser extension to proceed to the next step. \n`,
     headerIcon: "/nft-illustration.svg",

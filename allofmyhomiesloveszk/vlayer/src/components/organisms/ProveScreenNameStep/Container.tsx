@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTwitterAccountProof } from "../../../hooks/useTwitterAccountProof";
-import { ProveStepPresentational } from "./Presentational";
+import { ProveScreenNamePresentational } from "./Presentational";
 import { useAccount } from "wagmi";
 
-export const ProveStep = () => {
+export const ProveScreenNameStep = () => {
   const navigate = useNavigate();
   const { address } = useAccount();
   const [disabled, setDisabled] = useState(false);
@@ -28,7 +28,7 @@ export const ProveStep = () => {
 
   useEffect(() => {
     if (result) {
-      void navigate("/mint");
+      void navigate("/start-followers-count-proving");
     }
   }, [result, navigate]);
 
@@ -43,7 +43,7 @@ export const ProveStep = () => {
   }, [error]);
 
   return (
-    <ProveStepPresentational
+    <ProveScreenNamePresentational
       requestWebProof={requestWebProof}
       isPending={isPending}
       disabled={disabled}
