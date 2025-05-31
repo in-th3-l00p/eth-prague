@@ -72,7 +72,7 @@ export default function CreatorDashboard() {
   const supabase = createClient()
 
   // Wallet connection hooks
-  const { isConnected, isConnecting } = useAccount()
+  const { isConnected, isConnecting, address } = useAccount()
 
   useEffect(() => {
     const getUser = async () => {
@@ -85,9 +85,6 @@ export default function CreatorDashboard() {
         }
         
         setUser(user)
-        
-        // Check for account proof
-        await checkAccountProof(user.id)
       } catch (error) {
         console.error('Error fetching user:', error)
         router.push('/login')
@@ -103,19 +100,31 @@ export default function CreatorDashboard() {
         router.push('/login')
       } else if (session?.user) {
         setUser(session.user)
-        checkAccountProof(session.user.id)
       }
     })
 
     return () => subscription.unsubscribe()
   }, [supabase.auth, router])
 
-  const checkAccountProof = async (userId: string) => {
+  // Check account proof when wallet is connected and user is loaded
+  useEffect(() => {
+    if (user && isConnected && address) {
+      checkAccountProof(address)
+    }
+  }, [user, isConnected, address])
+
+  const checkAccountProof = async (walletAddress?: string) => {
+    if (!walletAddress) {
+      // No wallet connected, redirect to verification
+      router.push('/creator/verify')
+      return
+    }
+
     try {
       const { data, error } = await supabase
         .from('account_proofs')
         .select('*')
-        .eq('user_id', userId)
+        .eq('wallet', walletAddress)
         .single()
 
       if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
@@ -123,7 +132,7 @@ export default function CreatorDashboard() {
         return
       }
 
-      if (data && data.nft_address) {
+      if (data && data.wallet && data.screen_name) {
         setAccountProof(data)
       } else {
         // No valid account proof found, redirect to verification page
