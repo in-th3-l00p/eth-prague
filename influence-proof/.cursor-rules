@@ -1,0 +1,399 @@
+---
+description: "Influence-Proof: vLayer zkTLS Micro Frontend for Influencer Verification"
+globs:
+  - "influence-proof/src/**/*.ts"
+  - "influence-proof/src/**/*.tsx"
+  - "influence-proof/src/**/*.sol"
+  - "influence-proof/src/**/*.js"
+  - "influence-proof/src/**/*.json"
+alwaysApply: true
+---
+
+## Project: Influence-Proof
+
+### Overview
+Influence-Proof is a vLayer-powered micro frontend that implements zkTLS (Zero-Knowledge Transport Layer Security) proofs to verify influencer credentials on social media platforms. The system uses Web Proofs to cryptographically verify social media data without exposing sensitive information, enabling trustless verification of influencer status and engagement metrics.
+
+The project implements a two-stage verification process:
+1. **Account Ownership Verification**: Proves ownership of a social media account and mints an ERC721 NFT
+2. **Influence Metrics Verification**: Verifies follower count and engagement metrics to mint an ERC20 token representing the influencer's social capital
+
+### Technical Architecture
+
+#### vLayer Integration
+This project leverages vLayer's zkTLS infrastructure, which introduces two new types of smart contracts:
+- **Prover Contracts**: Execute off-chain with access to Web Proofs, Time Travel, Teleport, and Email Proofs
+- **Verifier Contracts**: Execute on-chain, verify proofs, and trigger arbitrary functions
+
+#### Core Components
+
+**1. Prover Contracts**
+- `AccountOwnershipProver.sol`: Extracts and proves ownership of social media account (screen name)
+- `InfluenceMetricsProver.sol`: Extracts follower count and engagement metrics from recent posts
+
+**2. Verifier Contracts**
+- `AccountVerifier.sol`: Verifies account ownership proof and mints ERC721 NFT
+- `InfluenceVerifier.sol`: Verifies influence metrics and mints ERC20 token if thresholds are met
+
+**3. Frontend Application**
+- React-based micro frontend with vLayer SDK integration
+- Multi-step form guiding users through the verification process
+- Real-time proof generation and submission
+
+### Smart Contract Architecture
+
+#### Account Ownership Flow
+```solidity
+// AccountOwnershipProver.sol
+contract AccountOwnershipProver {
+    function proveAccountOwnership(string memory platformUrl) 
+        public 
+        returns (Proof memory proof, string memory screenName, address userWallet) 
+    {
+        // Use vLayer Web Proofs to extract screen name from platform API
+        UnverifiedPage memory page = getPage(platformUrl);
+        string memory extractedScreenName = page
+            .verify("api.twitter.com/1.1/account/verify_credentials.json")
+            .jsonGetString("screen_name");
+        
+        return (proof, extractedScreenName, msg.sender);
+    }
+}
+
+// AccountVerifier.sol
+contract AccountVerifier is Verifier, ERC721 {
+    mapping(string => address) public screenNameToOwner;
+    mapping(address => string) public ownerToScreenName;
+    
+    function verifyAndMintAccountNFT(
+        Proof memory proof,
+        string memory screenName,
+        address userWallet
+    ) public onlyVerified(ACCOUNT_PROVER_ADDRESS, PROVE_ACCOUNT_SELECTOR) {
+        require(screenNameToOwner[screenName] == address(0), "Account already verified");
+        
+        // Mint ERC721 NFT representing account ownership
+        uint256 tokenId = _nextTokenId++;
+        _mint(userWallet, tokenId);
+        
+        // Store mapping for future influence verification
+        screenNameToOwner[screenName] = userWallet;
+        ownerToScreenName[userWallet] = screenName;
+        
+        emit AccountVerified(userWallet, screenName, tokenId);
+    }
+}
+```
+
+#### Influence Metrics Flow
+```solidity
+// InfluenceMetricsProver.sol
+contract InfluenceMetricsProver {
+    function proveInfluenceMetrics(string memory screenName) 
+        public 
+        returns (
+            Proof memory proof, 
+            string memory verifiedScreenName,
+            uint256 followerCount,
+            uint256 averageEngagement
+        ) 
+    {
+        // Verify user profile and extract follower count
+        UnverifiedPage memory profilePage = getPage(
+            string.concat("api.twitter.com/1.1/users/show.json?screen_name=", screenName)
+        );
+        
+        uint256 followers = profilePage
+            .verify("api.twitter.com/1.1/users/show.json")
+            .jsonGetUint("followers_count");
+        
+        // Get recent posts and calculate average engagement
+        UnverifiedPage memory timelinePage = getPage(
+            string.concat("api.twitter.com/1.1/statuses/user_timeline.json?screen_name=", screenName, "&count=5")
+        );
+        
+        uint256 totalEngagement = 0;
+        uint256 postCount = 0;
+        
+        // Extract engagement from last 5 posts
+        for (uint i = 0; i < 5; i++) {
+            try timelinePage.jsonGetUint(string.concat("[", i.toString(), "].favorite_count")) returns (uint256 likes) {
+                uint256 retweets = timelinePage.jsonGetUint(string.concat("[", i.toString(), "].retweet_count"));
+                totalEngagement += likes + retweets;
+                postCount++;
+            } catch {
+                break; // No more posts
+            }
+        }
+        
+        uint256 avgEngagement = postCount > 0 ? totalEngagement / postCount : 0;
+        
+        return (proof, screenName, followers, avgEngagement);
+    }
+}
+
+// InfluenceVerifier.sol
+contract InfluenceVerifier is Verifier, ERC20 {
+    AccountVerifier public immutable accountVerifier;
+    
+    uint256 public constant MIN_FOLLOWERS = 10;
+    uint256 public constant MIN_ENGAGEMENT = 5;
+    
+    mapping(address => bool) public hasInfluenceToken;
+    
+    constructor(address _accountVerifier) ERC20("InfluenceToken", "INFL") {
+        accountVerifier = AccountVerifier(_accountVerifier);
+    }
+    
+    function verifyAndMintInfluenceToken(
+        Proof memory proof,
+        string memory screenName,
+        uint256 followerCount,
+        uint256 averageEngagement
+    ) public onlyVerified(INFLUENCE_PROVER_ADDRESS, PROVE_INFLUENCE_SELECTOR) {
+        // Verify caller owns the account NFT for this screen name
+        address accountOwner = accountVerifier.screenNameToOwner(screenName);
+        require(accountOwner == msg.sender, "Not account owner");
+        require(!hasInfluenceToken[msg.sender], "Already has influence token");
+        
+        // Check influence thresholds
+        require(followerCount >= MIN_FOLLOWERS, "Insufficient followers");
+        require(averageEngagement >= MIN_ENGAGEMENT, "Insufficient engagement");
+        
+        // Mint influence token (amount based on metrics)
+        uint256 tokenAmount = calculateTokenAmount(followerCount, averageEngagement);
+        _mint(msg.sender, tokenAmount);
+        hasInfluenceToken[msg.sender] = true;
+        
+        emit InfluenceTokenMinted(msg.sender, screenName, followerCount, averageEngagement, tokenAmount);
+    }
+    
+    function calculateTokenAmount(uint256 followers, uint256 engagement) internal pure returns (uint256) {
+        // Token amount formula: base amount + follower bonus + engagement bonus
+        uint256 baseAmount = 1000 * 10**18; // 1000 tokens base
+        uint256 followerBonus = (followers * 10**18) / 10; // 0.1 token per follower
+        uint256 engagementBonus = engagement * 50 * 10**18; // 50 tokens per avg engagement point
+        
+        return baseAmount + followerBonus + engagementBonus;
+    }
+}
+```
+
+### Frontend Implementation
+
+#### Tech Stack
+- **Framework**: Next.js 14 with App Router
+- **Styling**: Tailwind CSS for responsive design
+- **Web3**: vLayer SDK for proof generation and submission
+- **State Management**: React hooks with Context API
+- **UI Components**: Custom components with loading states and error handling
+
+#### Key Features
+- **Multi-step Verification Flow**: Guided process from account connection to token minting
+- **Real-time Proof Generation**: Browser-based zkTLS proof creation using vLayer SDK
+- **Progress Tracking**: Visual indicators for each verification stage
+- **Error Handling**: Comprehensive error states with retry mechanisms
+- **Responsive Design**: Mobile-first approach for accessibility
+
+#### Application Structure
+```
+influence-proof/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx                 # Landing page with verification flow
+│   │   ├── verify/
+│   │   │   ├── account/page.tsx     # Account ownership verification
+│   │   │   └── influence/page.tsx   # Influence metrics verification
+│   │   └── success/page.tsx         # Success page with token details
+│   ├── components/
+│   │   ├── VerificationFlow.tsx     # Main verification component
+│   │   ├── AccountVerification.tsx  # Account ownership step
+│   │   ├── InfluenceVerification.tsx # Influence metrics step
+│   │   ├── ProofGenerator.tsx       # vLayer proof generation
+│   │   └── ui/                      # Reusable UI components
+│   ├── contracts/
+│   │   ├── AccountOwnershipProver.sol
+│   │   ├── AccountVerifier.sol
+│   │   ├── InfluenceMetricsProver.sol
+│   │   └── InfluenceVerifier.sol
+│   ├── lib/
+│   │   ├── vlayer.ts               # vLayer SDK configuration
+│   │   ├── contracts.ts            # Contract addresses and ABIs
+│   │   └── utils.ts                # Utility functions
+│   └── types/
+│       ├── vlayer.ts               # vLayer type definitions
+│       └── contracts.ts            # Contract type definitions
+├── public/
+│   └── assets/                     # Static assets
+├── package.json
+├── next.config.js
+├── tailwind.config.js
+└── tsconfig.json
+```
+
+### vLayer SDK Integration
+
+#### Proof Generation
+```typescript
+import { createVlayerClient, type Proof } from '@vlayer/sdk';
+
+const vlayerClient = createVlayerClient({
+  url: process.env.NEXT_PUBLIC_VLAYER_URL,
+});
+
+// Generate account ownership proof
+async function generateAccountProof(platformUrl: string): Promise<{
+  proof: Proof;
+  screenName: string;
+  userWallet: string;
+}> {
+  const result = await vlayerClient.prove({
+    address: ACCOUNT_PROVER_ADDRESS,
+    functionName: 'proveAccountOwnership',
+    args: [platformUrl],
+    proverAbi: AccountOwnershipProverABI,
+  });
+  
+  return result;
+}
+
+// Generate influence metrics proof
+async function generateInfluenceProof(screenName: string): Promise<{
+  proof: Proof;
+  screenName: string;
+  followerCount: bigint;
+  averageEngagement: bigint;
+}> {
+  const result = await vlayerClient.prove({
+    address: INFLUENCE_PROVER_ADDRESS,
+    functionName: 'proveInfluenceMetrics',
+    args: [screenName],
+    proverAbi: InfluenceMetricsProverABI,
+  });
+  
+  return result;
+}
+```
+
+#### Contract Interaction
+```typescript
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+
+function useAccountVerification() {
+  const { writeContract, data: hash, isPending } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  const verifyAccount = async (proof: Proof, screenName: string, userWallet: string) => {
+    writeContract({
+      address: ACCOUNT_VERIFIER_ADDRESS,
+      abi: AccountVerifierABI,
+      functionName: 'verifyAndMintAccountNFT',
+      args: [proof, screenName, userWallet],
+    });
+  };
+
+  return {
+    verifyAccount,
+    isPending: isPending || isConfirming,
+    isSuccess,
+  };
+}
+```
+
+### Security Considerations
+
+#### zkTLS Security Model
+- **Trust Assumptions**: Relies on vLayer's notary network for TLS session verification
+- **Privacy Preservation**: Sensitive data never leaves the user's browser
+- **Proof Integrity**: Cryptographic guarantees prevent tampering with social media data
+- **Replay Protection**: Proofs include timestamps and nonces to prevent reuse
+
+#### Smart Contract Security
+- **Access Control**: Only verified proofs can trigger contract functions
+- **Reentrancy Protection**: Use of OpenZeppelin's security patterns
+- **Input Validation**: Comprehensive validation of all user inputs
+- **Upgrade Safety**: Immutable contracts with careful initialization
+
+### Development Workflow
+
+#### Local Development Setup
+```bash
+# Install dependencies
+npm install
+
+# Start vLayer local development environment
+npx vlayer dev
+
+# Deploy contracts to local testnet
+npx vlayer deploy --network local
+
+# Start frontend development server
+npm run dev
+```
+
+#### Testing Strategy
+- **Unit Tests**: Individual component and function testing
+- **Integration Tests**: End-to-end verification flow testing
+- **Contract Tests**: Comprehensive smart contract testing with Foundry
+- **zkTLS Tests**: Mock social media API responses for proof generation testing
+
+#### Deployment Pipeline
+- **Staging**: Deploy to vLayer testnet for integration testing
+- **Production**: Deploy to vLayer mainnet with proper monitoring
+- **Frontend**: Deploy to Vercel with environment-specific configurations
+
+### Performance Optimization
+
+#### Proof Generation
+- **Caching**: Cache frequently accessed social media data
+- **Batching**: Combine multiple API calls where possible
+- **Error Handling**: Graceful degradation for API failures
+- **Progress Indicators**: Real-time feedback during proof generation
+
+#### Frontend Performance
+- **Code Splitting**: Lazy load verification components
+- **Image Optimization**: Optimized assets for faster loading
+- **Bundle Analysis**: Regular bundle size monitoring
+- **Caching Strategy**: Effective caching for static assets
+
+### Monitoring and Analytics
+
+#### Application Metrics
+- **Verification Success Rate**: Track successful vs failed verifications
+- **Proof Generation Time**: Monitor performance of zkTLS proof creation
+- **User Journey Analytics**: Understand user behavior through verification flow
+- **Error Tracking**: Comprehensive error logging and alerting
+
+#### Smart Contract Events
+```solidity
+event AccountVerified(address indexed user, string screenName, uint256 tokenId);
+event InfluenceTokenMinted(
+    address indexed user, 
+    string screenName, 
+    uint256 followerCount, 
+    uint256 averageEngagement, 
+    uint256 tokenAmount
+);
+```
+
+### Future Enhancements
+
+#### Multi-Platform Support
+- **Instagram Integration**: Extend to Instagram influencer verification
+- **TikTok Support**: Add TikTok metrics and verification
+- **YouTube Integration**: Include subscriber and view metrics
+- **LinkedIn Professional**: Professional network influence verification
+
+#### Advanced Metrics
+- **Engagement Quality**: Analyze comment sentiment and authenticity
+- **Growth Trends**: Track follower growth over time
+- **Cross-Platform Correlation**: Verify influence across multiple platforms
+- **Niche Authority**: Measure influence within specific topics or industries
+
+#### Governance and Upgrades
+- **DAO Integration**: Community governance for threshold adjustments
+- **Metric Updates**: Ability to update influence calculation formulas
+- **Platform Additions**: Streamlined process for adding new social platforms
+- **Dispute Resolution**: Mechanism for handling verification disputes
+
+This micro frontend serves as a crucial component in the Propellant ecosystem, enabling trustless verification of influencer credentials and creating a foundation for the creator economy built on verifiable social capital. 
