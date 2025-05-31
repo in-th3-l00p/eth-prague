@@ -13,3 +13,6 @@
 [submodule "zkproofs/twitter/token-generator/lib/forge-std"]
 	path = zkproofs/twitter/token-generator/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "zkproofs/retry/my-web-proof/lib/forge-std"]
+	path = zkproofs/retry/my-web-proof/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
