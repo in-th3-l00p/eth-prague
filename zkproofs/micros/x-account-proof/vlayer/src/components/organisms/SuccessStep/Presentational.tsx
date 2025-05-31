@@ -1,44 +1,49 @@
 import { Link } from "react-router";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
-export const SuccessStepPresentational = ({
-  tx,
-  handle,
-  blockExplorer,
-}: {
-  tx: string;
-  handle: string;
-  blockExplorer?: string;
-}) => {
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
+
+export const SuccessStepPresentational = () => {
   return (
-    <>
-      <p className="text-gray-500">
-        @{handle} was minted to{" "}
-        <a
-          href={`${blockExplorer}/tx/${tx}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-violet-500 underline"
-        >
-          {tx.slice(0, 6)}...{tx.slice(-4)}
-        </a>
-      </p>
-      <p className="text-gray-500">
-        <a
-          href={`${blockExplorer}/tx/${tx}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm font-semibold leading-4 text-center text-indigo-600 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 inline-flex items-center"
-          tabIndex={0}
-        >
-          See it on block explorer
-          <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5 ml-1" />
-        </a>
-      </p>
-      <div className="mt-2 flex justify-center">
-        <Link to="/" id="nextButton">
-          Start again
+    <div className="w-full max-w-md mx-auto text-center">
+      {/* Success Icon */}
+      <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+        <CheckCircleIcon className="w-10 h-10 text-white" />
+      </div>
+
+      {/* Success Message */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">
+          Verification Complete!
+        </h2>
+        <p className="text-gray-600 leading-relaxed">
+          Your X account has been successfully verified. You can now access creator features and start building your community.
+        </p>
+      </div>
+
+      {/* Success Stats */}
+      <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-center justify-center space-x-2 text-green-700">
+          <CheckCircleIcon className="w-5 h-5" />
+          <span className="text-sm font-medium">Account ownership verified</span>
+        </div>
+        <div className="flex items-center justify-center space-x-2 text-green-700 mt-2">
+          <CheckCircleIcon className="w-5 h-5" />
+          <span className="text-sm font-medium">NFT ready to mint</span>
+        </div>
+      </div>
+
+      {/* CTA Button */}
+      <div className="text-center">
+        <Link to="http://localhost:3000/creator" id="nextButton" className="w-full">
+          Continue to Creator Dashboard
         </Link>
       </div>
-    </>
+
+      {/* Additional Note */}
+      <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-xs text-blue-700 text-center">
+          🎉 You can now launch tokens and engage with your community!
+        </p>
+      </div>
+    </div>
   );
 };

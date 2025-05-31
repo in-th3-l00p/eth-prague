@@ -53,7 +53,7 @@ The following micro frontends will be started:
 
 1. **token-generator** (`micros/token-generator/vlayer/`) - Token generation frontend
 2. **x-account-proof** (`micros/x-account-proof/vlayer/`) - X account proof frontend  
-3. **x-onramp-proof** (`micros/x-onramp-proof/vlayer/`) - X onramp proof frontend
+3. **onramp-proof** (`micros/onramp-proof/vlayer/`) - X onramp proof frontend
 
 Each micro frontend runs the `bun run web:dev` command and will be accessible on different ports.
 
@@ -117,7 +117,7 @@ The `scripts/check-dependencies.js` script verifies your environment:
 The `concurrently` package provides colored output for each service:
 - **token-gen**: Cyan
 - **x-account**: Magenta
-- **x-onramp**: Yellow
+- **onramp**: Yellow
 
 ## Troubleshooting
 

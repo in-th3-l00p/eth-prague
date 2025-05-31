@@ -14,9 +14,9 @@
     "deploy:dev": "VLAYER_ENV=dev bun run deploy.ts",
     "test-web:dev": "TEST_MODE=headed VLAYER_ENV=dev bun run playwright test",
     "test-web:testnet": "echo \"No tests specified yet\"",
-    "web:dev": "VLAYER_ENV=dev bun run deploy.ts && vite",
-    "web:testnet": "VLAYER_ENV=testnet bun run deploy.ts && vite",
-    "web:mainnet": "VLAYER_ENV=mainnet bun run deploy.ts && vite",
+    "web:dev": "VLAYER_ENV=dev bun run deploy.ts && vite --port 5174",
+    "web:testnet": "VLAYER_ENV=testnet bun run deploy.ts && vite --port 5174",
+    "web:mainnet": "VLAYER_ENV=mainnet bun run deploy.ts && vite --port 5174",
     "test:unit": "vitest --run"
   },
   "dependencies": {

@@ -10,7 +10,7 @@ const execAsync = util.promisify(exec);
 const microProjects = [
   'micros/token-generator/vlayer',
   'micros/x-account-proof/vlayer',
-  'micros/x-onramp-proof/vlayer'
+  'micros/onramp-proof/vlayer'
 ];
 
 async function checkBun() {

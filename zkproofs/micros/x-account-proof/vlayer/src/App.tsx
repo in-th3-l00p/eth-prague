@@ -56,35 +56,45 @@ createAppKit({
 
 const App = () => {
   return (
-    <div id="app">
-      <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-        <QueryClientProvider client={queryClient}>
-          <ProofProvider
-            config={{
-              proverUrl: import.meta.env.VITE_PROVER_URL,
-              wsProxyUrl: import.meta.env.VITE_WS_PROXY_URL,
-              notaryUrl: import.meta.env.VITE_NOTARY_URL,
-              token: import.meta.env.VITE_VLAYER_API_TOKEN,
-            }}
-          >
-            <BrowserRouter>
-              <ErrorBoundary FallbackComponent={AppErrorBoundaryComponent}>
-                <Routes>
-                  <Route path="/" element={<Layout />}>
-                    {steps.map((step) => (
-                      <Route
-                        key={step.path}
-                        path={step.path}
-                        element={<step.component />}
-                      />
-                    ))}
-                  </Route>
-                </Routes>
-              </ErrorBoundary>
-            </BrowserRouter>
-          </ProofProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
+    <div id="app" className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="relative z-10">
+        <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            <ProofProvider
+              config={{
+                proverUrl: import.meta.env.VITE_PROVER_URL,
+                wsProxyUrl: import.meta.env.VITE_WS_PROXY_URL,
+                notaryUrl: import.meta.env.VITE_NOTARY_URL,
+                token: import.meta.env.VITE_VLAYER_API_TOKEN,
+              }}
+            >
+              <BrowserRouter>
+                <ErrorBoundary FallbackComponent={AppErrorBoundaryComponent}>
+                  <Routes>
+                    <Route path="/" element={<Layout />}>
+                      {steps.map((step) => (
+                        <Route
+                          key={step.path}
+                          path={step.path}
+                          element={<step.component />}
+                        />
+                      ))}
+                    </Route>
+                  </Routes>
+                </ErrorBoundary>
+              </BrowserRouter>
+            </ProofProvider>
+          </QueryClientProvider>
+        </WagmiProvider>
+      </div>
     </div>
   );
 };
