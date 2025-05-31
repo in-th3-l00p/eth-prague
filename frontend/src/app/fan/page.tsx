@@ -342,12 +342,22 @@ export default function FanDashboard() {
             </Button>
           </div>
           
-          <Button 
-            className="h-9 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-          >
-            <EyeIcon className="w-4 h-4 mr-2" />
-            Your Tokens
-          </Button>
+          <div className="flex items-center space-x-3">
+            <Button 
+              onClick={() => router.push('/onramp')}
+              className="h-9 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+            >
+              <span className="mr-2">€</span>
+              Buy with EUR
+            </Button>
+            
+            <Button 
+              className="h-9 px-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+            >
+              <EyeIcon className="w-4 h-4 mr-2" />
+              Your Tokens
+            </Button>
+          </div>
         </div>
 
         {/* Social Feed */}
