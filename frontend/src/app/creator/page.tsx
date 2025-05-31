@@ -8,13 +8,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { WalletConnect } from '@/components/WalletConnect'
+import { useAccount } from 'wagmi'
 import { 
   RocketLaunchIcon, 
   ChartBarIcon, 
   CurrencyDollarIcon, 
   UsersIcon,
   PlusIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  WalletIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline'
 
 const stats = [
@@ -67,6 +70,9 @@ export default function CreatorDashboard() {
   const [accountProof, setAccountProof] = useState<any>(null)
   const router = useRouter()
   const supabase = createClient()
+
+  // Wallet connection hooks
+  const { isConnected, isConnecting } = useAccount()
 
   useEffect(() => {
     const getUser = async () => {
@@ -135,7 +141,7 @@ export default function CreatorDashboard() {
     router.push('/')
   }
 
-  if (loading) {
+  if (loading || isConnecting) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
@@ -145,6 +151,109 @@ export default function CreatorDashboard() {
 
   if (!user || !accountProof) {
     return null // Will redirect to verification or login
+  }
+
+  // Show wallet connection prompt if wallet is not connected
+  if (!isConnected) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex h-16 items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => router.push('/dashboard')}
+                  className="mr-2"
+                >
+                  <ArrowLeftIcon className="h-5 w-5" />
+                </Button>
+                <Link href="/creator" className="flex items-center space-x-3">
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">P</span>
+                  </div>
+                  <span className="text-lg font-bold text-gray-900">Creator Mode</span>
+                </Link>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                {/* Wallet Connection */}
+                <WalletConnect showBalance={true} />
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="-m-1.5 p-1.5 aspect-square">
+                      <span className="sr-only">Open user menu</span>
+                      <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center aspect-square">
+                        <span className="text-white font-semibold text-sm">
+                          {user.email?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-32">
+                    <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                      Switch Mode
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Wallet Connection Prompt */}
+        <main className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-orange-100 mb-6">
+              <ExclamationTriangleIcon className="h-10 w-10 text-orange-600" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              Wallet Connection Required
+            </h1>
+            <p className="text-lg text-gray-600 mb-8">
+              You need to connect your wallet to access the Creator Dashboard. Your wallet is required for token management and blockchain interactions.
+            </p>
+            
+            <Card className="mx-auto max-w-md">
+              <CardHeader className="text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-purple-100 mb-4">
+                  <WalletIcon className="h-6 w-6 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl">Connect Your Wallet</CardTitle>
+                <CardDescription>
+                  Connect your Web3 wallet to continue with creator features
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <WalletConnect 
+                  variant="gradient" 
+                  className="w-full justify-center py-3 text-lg"
+                />
+                <p className="text-sm text-gray-500 text-center">
+                  Supported wallets: MetaMask, WalletConnect, and other Web3 wallets
+                </p>
+              </CardContent>
+            </Card>
+
+            <div className="mt-8">
+              <Button
+                variant="outline"
+                onClick={() => router.push('/dashboard')}
+                className="mr-4"
+              >
+                Back to Dashboard
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
@@ -205,11 +314,30 @@ export default function CreatorDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Creator Dashboard</h1>
-              <p className="mt-2 text-gray-600">Launch and manage your tokens</p>
+              <p className="mt-2 text-gray-600">
+                Launch and manage your tokens
+                {isConnected && (
+                  <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5"></div>
+                    Wallet Connected
+                  </span>
+                )}
+              </p>
             </div>
-            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+            <Button 
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              disabled={!isConnected}
+              onClick={() => {
+                if (!isConnected) {
+                  alert('Please connect your wallet first to launch a new token.')
+                  return
+                }
+                // Add token launch logic here
+                console.log('Launching new token...')
+              }}
+            >
               <PlusIcon className="w-5 h-5 mr-2" />
-              Launch New Token
+              {!isConnected ? 'Connect Wallet to Launch' : 'Launch New Token'}
             </Button>
           </div>
         </div>
