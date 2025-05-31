@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { RocketLaunchIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { WalletConnect } from '@/components/WalletConnect'
 import Link from 'next/link'
 
 export default function Dashboard() {
@@ -104,23 +105,27 @@ export default function Dashboard() {
               <span className="text-lg font-bold text-gray-900">Propellant</span>
             </Link>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="-m-1.5 p-1.5 aspect-square">
-                  <span className="sr-only">Open user menu</span>
-                  <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center aspect-square">
-                    <span className="text-white font-semibold text-sm">
-                      {user.email?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuItem onClick={handleSignOut}>
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center space-x-4">
+              <WalletConnect />
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="-m-1.5 p-1.5 aspect-square">
+                    <span className="sr-only">Open user menu</span>
+                    <div className="size-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center aspect-square">
+                      <span className="text-white font-semibold text-sm">
+                        {user.email?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32">
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>
