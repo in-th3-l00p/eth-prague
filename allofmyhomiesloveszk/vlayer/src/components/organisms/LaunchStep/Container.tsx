@@ -14,12 +14,12 @@ import { MintStepPresentational } from "./Presentational";
 import { ensureBalance } from "../../../utils/ethFaucet";
 import { AlreadyMintedError } from "../../../errors";
 
-export const MintStep = () => {
+export const LaunchStep = () => {
   const navigate = useNavigate();
   const modalRef = useRef<HTMLDialogElement>(null);
   const [mintedHandle, setMintedHandle] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
-  // Using mintingError state to throw error in useEffect because ErrorBoundary does not catch errors from async functions like handleMint
+  // Using mintingError state to throw error in useEffect because ErrorBoundary does not catch errors from async functions like handleLaunch
   const [mintingError, setMintingError] = useState<Error | null>(null);
   const [proverResult] = useLocalStorage("proverResult", "");
   const { address } = useAccount();
@@ -44,7 +44,7 @@ export const MintStep = () => {
     modalRef.current?.showModal();
   }, [proverResult]);
 
-  const handleMint = async () => {
+  const handleLaunch = async () => {
     setIsMinting(true);
     if (!proverResult) {
       return;
@@ -97,7 +97,7 @@ export const MintStep = () => {
 
   return (
     <MintStepPresentational
-      handleMint={() => void handleMint()}
+      handleMint={() => void handleLaunch()}
       isMinting={isMinting}
     />
   );

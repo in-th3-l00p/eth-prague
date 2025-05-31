@@ -9,7 +9,7 @@ export const MintStepPresentational = ({
     <>
       <div className="mt-7 flex justify-center flex-col items-center">
         <button disabled={isMinting} id="nextButton" onClick={handleMint}>
-          {isMinting ? "Minting..." : "Start Minting"}
+          {isMinting ? "Launching..." : "Launch"}
         </button>
       </div>
     </>
