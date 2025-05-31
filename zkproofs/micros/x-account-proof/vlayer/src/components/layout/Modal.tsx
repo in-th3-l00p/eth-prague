@@ -52,47 +52,37 @@ export const Modal = ({ children }: { children: React.ReactNode }) => {
   }, [currentStep?.description]);
 
   return (
-    <dialog className="modal" ref={modalRef}>
-      <div className="modal-box bg-white rounded-2xl">
+    <dialog className="modal backdrop-blur-sm bg-black/20" ref={modalRef}>
+      <div className="modal-box bg-gradient-to-br from-purple-50 via-white to-pink-50 rounded-2xl shadow-2xl border-0 max-w-2xl w-full mx-4">
         <motion.div
-          className="h-[490px] flex flex-col items-center justify-between"
-          initial={{ opacity: 0, scale: 0.1 }}
+          className="min-h-[600px] flex flex-col items-center justify-between p-6"
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
           transition={{ ease: "easeOut", duration: 0.3 }}
         >
           {/* Navigation */}
-          <Navigation />
+          <div className="w-full">
+            <Navigation />
+          </div>
+          
           {/* Progress Bar */}
           <AnimatePresence>
-            {!isWelcome && !isSuccessStep && <ProgressBar />}
+            {!isWelcome && !isSuccessStep && (
+              <div className="w-full mb-6">
+                <ProgressBar />
+              </div>
+            )}
           </AnimatePresence>
+          
           <ErrorBoundary FallbackComponent={StepErrorBoundaryComponent}>
-            {/* Header Icon */}
-            <AnimatePresence>
-              {currentStep?.headerIcon && (
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.1 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.1 }}
-                  transition={{ ease: "easeOut", duration: 0.3 }}
-                  src={currentStep?.headerIcon}
-                  alt="Success Icon"
-                  className="w-[282px] h-[150px]"
-                />
-              )}
-            </AnimatePresence>
-            <div className="flex-col flex gap-4 justify-between h-[284px] mb-2">
-              {/* Title */}
-              {currentStep?.title && (
-                <h3 className={`header ${descClass}`}>{currentStep?.title}</h3>
-              )}
-              {/* Description */}
-              <p className={`h-[116px] desc ${descClass}`}>{description}</p>
+            <div className="flex-col flex gap-6 justify-between flex-1 w-full max-w-md">
               {/* Content */}
-              <modalContext.Provider value={{ showModal, closeModal }}>
-                {children}
-              </modalContext.Provider>
+              <div className="flex-1 flex items-center justify-center w-full">
+                <modalContext.Provider value={{ showModal, closeModal }}>
+                  {children}
+                </modalContext.Provider>
+              </div>
             </div>
           </ErrorBoundary>
         </motion.div>
