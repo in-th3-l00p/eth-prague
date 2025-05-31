@@ -19,12 +19,12 @@ contract WebProverTest is VTest {
         address account = vm.addr(1);
 
         callProver();
-        (, string memory screenName, address addr) = prover.main(
+        (, int256 followersCount, address addr) = prover.main(
             webProof,
             account
         );
 
-        assert(screenName.equal("wktr0"));
+        assertEq(followersCount, 100);
         assertEq(addr, account);
     }
 
@@ -38,7 +38,7 @@ contract WebProverTest is VTest {
         callProver();
         try prover.main(webProof, account) returns (
             Proof memory,
-            string memory,
+            int256,
             address
         ) {
             revert("Expected error");

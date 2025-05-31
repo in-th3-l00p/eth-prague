@@ -116,16 +116,17 @@ export const useTwitterDataProof = (screenName: string) => {
   useEffect(() => {
     if (webProof) {
       console.log("webProof", webProof);
-      setWebProof(JSON.stringify(webProof));
+      setWebProof("{}");
     }
-  }, [JSON.stringify(webProof)]);
+  }, [webProof]);
 
   useEffect(() => {
     if (result) {
-      console.log("proverResult", result);
-      setProverResult(JSON.stringify(result));
+      setProverResult(JSON.stringify({
+        followersCount: Number.parseInt(((result as unknown as any[])[1] as bigint).toString())
+      }));
     }
-  }, [JSON.stringify(result)]);
+  }, [result]);
 
   return {
     requestWebProof,
