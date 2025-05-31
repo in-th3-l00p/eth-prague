@@ -8,46 +8,49 @@ import {
 import { useLocalStorage } from "usehooks-ts";
 import { WebProofConfig, ProveArgs } from "@vlayer/sdk";
 import { Abi, ContractFunctionName } from "viem";
-import { startPage, expectUrl, notarize } from "@vlayer/sdk/web_proof";
+import {startPage, expectUrl, notarize, userAction} from "@vlayer/sdk/web_proof";
 import { UseChainError, WebProofError } from "../errors";
 import webProofProver from "../../../out/WebProofProver.sol/WebProofProver";
 
-const webProofConfig: WebProofConfig<Abi, string> = {
-  proverCallCommitment: {
-    address: "0x0000000000000000000000000000000000000000",
-    proverAbi: [],
-    functionName: "proveWeb",
-    commitmentArgs: [],
-    chainId: 1,
-  },
-  logoUrl: "http://twitterswap.com/logo.png",
-  steps: [
-    startPage("https://x.com/", "Go to x.com login page"),
-    expectUrl("https://x.com/home", "Log in"),
-    notarize(
-      "https://api.x.com/1.1/account/settings.json",
-      "GET",
-      "Generate Proof of Twitter profile",
-      [
-        {
-          request: {
-            // redact all the headers
-            headers_except: [],
-          },
-        },
-        {
-          response: {
-            // response from api.x.com sometimes comes with Transfer-Encoding: Chunked
-            // which needs to be recognised by Prover and cannot be redacted
-            headers_except: ["Transfer-Encoding"],
-          },
-        },
-      ],
-    ),
-  ],
-};
+export const useTwitterFollowersProof = (screenName: string) => {
+  const webProofConfig: WebProofConfig<Abi, string> = {
+    proverCallCommitment: {
+      address: "0x0000000000000000000000000000000000000000",
+      proverAbi: [],
+      functionName: "proveWeb",
+      commitmentArgs: [],
+      chainId: 1,
+    },
+    logoUrl: "http://twitterswap.com/logo.png",
+    steps: [
+      startPage("https://x.com/", "Go to x.com"),
+      expectUrl(`https://x.com/home`, `Navigate to your home page`),
+      userAction(
+          `https://x.com/${screenName}`,
+          `Navigate to your profile page`,
+          { text: `@${screenName}` },
+          { domElement: "body", require: { exist: true } }
+      ),
+      notarize(
+          `https://x.com/i/api/graphql/xWw45l6nX7DP2FKRyePXSw/UserByScreenName?variables=%7B%22screen_name%22%3A%22georgetisc84245%22%7D&features=%7B%22hidden_profile_subscriptions_enabled%22%3Atrue%2C%22profile_label_improvements_pcf_label_in_post_enabled%22%3Atrue%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22subscriptions_verification_info_is_identity_verified_enabled%22%3Atrue%2C%22subscriptions_verification_info_verified_since_enabled%22%3Atrue%2C%22highlights_tweets_tab_ui_enabled%22%3Atrue%2C%22responsive_web_twitter_article_notes_tab_enabled%22%3Atrue%2C%22subscriptions_feature_can_gift_premium%22%3Atrue%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%7D&fieldToggles=%7B%22withAuxiliaryUserLabels%22%3Atrue%7D`,
+          "GET",
+          "Generate Proof of Twitter profile data",
+          [
+            {
+              request: {
+                headers_except: [],
+              },
+            },
+            {
+              response: {
+                headers_except: ["Transfer-Encoding"],
+              },
+            },
+          ],
+      )
+    ],
+  };
 
-export const useTwitterAccountProof = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const {
@@ -77,7 +80,7 @@ export const useTwitterAccountProof = () => {
     address: import.meta.env.VITE_PROVER_ADDRESS as `0x${string}`,
     proverAbi: webProofProver.abi,
     chainId: chain?.id,
-    functionName: "account",
+    functionName: "followers",
     gasLimit: Number(import.meta.env.VITE_GAS_LIMIT),
   };
 

@@ -19,7 +19,7 @@ contract WebProverTest is VTest {
         address account = vm.addr(1);
 
         callProver();
-        (, string memory screenName, address addr) = prover.main(
+        (, string memory screenName, address addr) = prover.accountProof(
             webProof,
             account
         );
@@ -36,7 +36,7 @@ contract WebProverTest is VTest {
         address account = vm.addr(1);
 
         callProver();
-        try prover.main(webProof, account) returns (
+        try prover.accountProof(webProof, account) returns (
             Proof memory,
             string memory,
             address

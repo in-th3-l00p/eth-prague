@@ -1,4 +1,4 @@
-export const ProveFollowersPresentational = ({
+export const ProveScreenNamePresentational = ({
   requestWebProof,
   isPending,
   disabled,
