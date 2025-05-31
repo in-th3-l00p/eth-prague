@@ -28,7 +28,7 @@ export const MintStep = () => {
   const { status } = useWaitForTransactionReceipt({
     hash: txHash,
   });
-
+  const screenName = window.location.search.split("screenName=")[0].split("=")[1];
   useEffect(() => {
     if (proverResult) {
       const result = JSON.parse(proverResult) as Parameters<
@@ -73,7 +73,7 @@ export const MintStep = () => {
   useEffect(() => {
     if (status === "success") {
       setIsMinting(false);
-      void navigate(`/success?tx=${txHash}&handle=${mintedHandle}`);
+      void navigate(`/success?tx=${txHash}&handle=${mintedHandle}&screenName=${screenName}`);
     }
   }, [status, txHash, mintedHandle, navigate]);
 

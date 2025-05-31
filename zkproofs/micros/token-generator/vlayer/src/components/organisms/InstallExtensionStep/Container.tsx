@@ -5,12 +5,12 @@ import { useEffect } from "react";
 
 export const InstallExtension = () => {
   const { hasExtensionInstalled } = useExtension();
-
   const navigate = useNavigate();
+  const screenName = window.location.search.split("screenName=")[0].split("=")[1];
 
   useEffect(() => {
     if (hasExtensionInstalled) {
-      void navigate("/start-proving");
+      void navigate(`/start-proving?screenName=${screenName}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasExtensionInstalled]);

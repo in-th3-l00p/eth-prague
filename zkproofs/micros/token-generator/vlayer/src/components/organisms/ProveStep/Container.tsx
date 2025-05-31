@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { useTwitterAccountProof } from "../../../hooks/useTwitterAccountProof";
+import { useTwitterDataProof } from "../../../hooks/useTwitterAccountProof";
 import { ProveStepPresentational } from "./Presentational";
 import { useAccount } from "wagmi";
 
@@ -18,7 +18,7 @@ export const ProveStep = () => {
     isCallProverIdle,
     result,
     error,
-  } = useTwitterAccountProof();
+  } = useTwitterDataProof(window.location.search.split("screenName=")[1]);
 
   useEffect(() => {
     if (webProof && isCallProverIdle) {

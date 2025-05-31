@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { isMobile } from "../../../utils";
 
 export const WelcomeScreen = () => {
+  const screenName = window.location.search.split("screenName=")[0].split("=")[1];
   return (
     <>
       {isMobile && (
@@ -12,7 +13,7 @@ export const WelcomeScreen = () => {
       {!isMobile && (
         <div className="mt-5 flex justify-center">
           <Link
-            to="connect-wallet"
+            to={`connect-wallet?screenName=${screenName}`}
             id="nextButton"
             data-testid="start-page-button"
           >
