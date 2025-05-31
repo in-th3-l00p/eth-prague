@@ -4,3 +4,9 @@
 [submodule "onramp-proof/lib/forge-std"]
 	path = onramp-proof/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "x-stuff/account-proof/lib/forge-std"]
+	path = x-stuff/account-proof/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "x-stuff/influence-proof/lib/forge-std"]
+	path = x-stuff/influence-proof/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
