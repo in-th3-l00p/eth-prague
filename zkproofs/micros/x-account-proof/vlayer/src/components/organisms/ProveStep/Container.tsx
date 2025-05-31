@@ -48,41 +48,10 @@ export const ProveStep = () => {
 
   useEffect(() => {
     if (result) {
-      // Store the result and trigger verification
       setProverResult(JSON.stringify(result));
-      void handleVerify();
-    }
-  }, [result]);
-
-  const handleVerify = async () => {
-    if (!result) return;
-    
-    setIsVerifying(true);
-    
-    const proofData = result as Parameters<typeof writeContract>[0]["args"];
-    const writeContractArgs: Parameters<typeof writeContract>[0] = {
-      address: import.meta.env.VITE_VERIFIER_ADDRESS as `0x${string}`,
-      abi: webProofProofVerifier.abi,
-      functionName: "verify",
-      args: proofData,
-    };
-
-    try {
-      await ensureBalance(address as `0x${string}`, balance?.value ?? 0n);
-    } catch (error) {
-      setVerifyingError(error as Error);
-      return;
-    }
-
-    writeContract(writeContractArgs);
-  };
-
-  useEffect(() => {
-    if (status === "success") {
-      setIsVerifying(false);
       void navigate("/success");
     }
-  }, [status, navigate]);
+  }, [result]);
 
   useEffect(() => {
     if (writeError) {
