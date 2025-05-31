@@ -52,7 +52,7 @@ export const ProveStep = () => {
           const { data, error: dbError } = await supabase
             .from('account_proofs')
             .upsert({
-              wallet: address,
+              wallet: address.toLowerCase(),
               screen_name: screenName
             })
             .select();

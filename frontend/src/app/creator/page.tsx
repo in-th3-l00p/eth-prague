@@ -124,7 +124,7 @@ export default function CreatorDashboard() {
       const { data, error } = await supabase
         .from('account_proofs')
         .select('*')
-        .eq('wallet', walletAddress)
+        .eq('wallet', walletAddress.toLowerCase())
         .single()
 
       if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
