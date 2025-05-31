@@ -7,3 +7,6 @@
 [submodule "zkproofs/onramp-proof/lib/forge-std"]
 	path = zkproofs/onramp-proof/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "zkproofs/twitter/account-proof/lib/forge-std"]
+	path = zkproofs/twitter/account-proof/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
