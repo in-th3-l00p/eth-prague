@@ -9,6 +9,8 @@ import {Verifier} from "vlayer-0.1.0/Verifier.sol";
 contract WebProofVerifier is Verifier {
     address public prover;
 
+    mapping(address => string) public addressToScreenName;
+
     constructor(address _prover) {
         prover = _prover;
     }
@@ -17,5 +19,10 @@ contract WebProofVerifier is Verifier {
         public
         onlyVerified(prover, WebProofProver.main.selector)
     {
+        addressToScreenName[account] = screenName;
+    }
+
+    function getScreenName(address account) public view returns (string memory) {
+        return addressToScreenName[account];
     }
 }
