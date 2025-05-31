@@ -19,7 +19,6 @@ contract WebProofVerifier is Verifier {
         public
         onlyVerified(prover, WebProofProver.main.selector)
     {
-        require(addressToScreenName[account] == "", "Account already verified");
         addressToScreenName[account] = screenName;
     }
 

@@ -17,7 +17,6 @@ import { AlreadyMintedError } from "../../../errors";
 export const MintStep = () => {
   const navigate = useNavigate();
   const modalRef = useRef<HTMLDialogElement>(null);
-  const [mintedHandle, setMintedHandle] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
   // Using mintingError state to throw error in useEffect because ErrorBoundary does not catch errors from async functions like handleMint
   const [mintingError, setMintingError] = useState<Error | null>(null);
@@ -39,7 +38,6 @@ export const MintStep = () => {
           "Serialized prover result from local storage is invalid",
         );
       }
-      setMintedHandle(result[1]);
     }
     modalRef.current?.showModal();
   }, [proverResult]);
@@ -73,9 +71,9 @@ export const MintStep = () => {
   useEffect(() => {
     if (status === "success") {
       setIsMinting(false);
-      void navigate(`/success?tx=${txHash}&handle=${mintedHandle}`);
+      void navigate(`/success`);
     }
-  }, [status, txHash, mintedHandle, navigate]);
+  }, [status, txHash, navigate]);
 
   useEffect(() => {
     if (error) {
