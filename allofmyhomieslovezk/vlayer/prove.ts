@@ -14,10 +14,16 @@ import {
 } from "@vlayer/sdk/config";
 
 let config = getConfig();
+const _usdc = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+const _uniswapRouter = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+const _uniswapFactory = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+const _treasury = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 
+// the deployVlayerContracts puts the first arg of the constructor the address
 const { prover, verifier } = await deployVlayerContracts({
   proverSpec,
   verifierSpec,
+  verifierArgs: [_usdc, _uniswapRouter, _uniswapFactory, _treasury],
 });
 
 await writeEnvVariables(".env", {
